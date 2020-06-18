@@ -59,7 +59,7 @@
 
 ** Do Genotypes match between Canadian and Spanish Datasets?
 
-
+  #+NAME: loadgenos1
   #+begin_src R :session ones
   #!/usr/bin/env R
   tableau <- function(name, ...) {
@@ -163,9 +163,373 @@
   : [1] "rs10035105 rs10076408 rs10120169 rs1022249 rs10225000 rs10268365 rs1029905 rs1033651 rs10405913 rs10424263 rs10435440 rs10445105 rs10493155 rs10512073 rs10736027 rs10797122 rs10805304 rs10812206 rs10860692 rs10869200 rs10930124 rs10989329 rs11074843 rs11532602 rs11632698 rs11634071 rs11637194 rs11647013 rs11734226 rs11735207 rs11743216 rs11790808 rs11819487 rs11845926 rs11849247 rs11897697 rs11904750 rs11971667 rs12001157 rs12005018 rs12006781 rs12037123 rs12059286 rs1221986 rs12227359 rs12346965 rs12417751 rs12420493 rs12422743 rs12437252 rs12470133 rs12476047 rs12502690 rs12515368 rs12644278 rs12682602 rs1275642 rs12793010 rs12820069 rs12887411 rs12931636 rs13118998 rs13147122 rs13225805 rs13259555 rs13264696 rs13267264 rs1329005 rs13314478 rs13428862 rs13431489 rs1355196 rs1372756 rs137856 rs1386628 rs1424712 rs1426654 rs1430916 rs1454075 rs1497956 rs1505518 rs1527941 rs1545254 rs1560001 rs1561245 rs1579450 rs1589390 rs160632 rs161330 rs1626593 rs1640007 rs16834698 rs16869058 rs16940213 rs16943302 rs16955641 rs16983070 rs17020449 rs17023989 rs17028962 rs17042329 rs17071817 rs17097599 rs17106727 rs17141671 rs17156078 rs17194591 rs17291521 rs17324762 rs17571029 rs17622920 rs1847458 rs1874848 rs1908970 rs1961712 rs1971518 rs2031077 rs2041876 rs2060241 rs2074685 rs2077305 rs2103186 rs2157739 rs2165183 rs2176804 rs2179932 rs2222723 rs2245007 rs2254835 rs2273440 rs2287807 rs2291977 rs2297604 rs2322847 rs2349057 rs2368540 rs2373901 rs2392243 rs2416012 rs2427285 rs2430408 rs2432055 rs2506814 rs2540834 rs2602647 rs2607272 rs2610166 rs2807873 rs2833135 rs28539549 rs2885857 rs3094315 rs3115876 rs3120834 rs3133916 rs35308549 rs35339599 rs3735453 rs3769439 rs3785138 rs3787062 rs3864814 rs387103 rs3934574 rs3935714 rs4043679 rs4111024 rs4236396 rs424970 rs431873 rs4380043 rs4391434 rs4458410 rs4515498 rs4574760 rs4634387 rs4641198 rs4653109 rs4658538 rs4665344 rs467095 rs468574 rs4694105 rs4698914 rs4711347 rs4768124 rs4768740 rs4786427 rs4822507 rs4918227 rs4954126 rs4980182 rs4986174 rs4987774 rs5028811 rs521896 rs561608 rs568291 rs5907429 rs5907446 rs5923089 rs5926166 rs5955721 rs5969198 rs5974208 rs5977376 rs5981162 rs5985414 rs6061052 rs6138938 rs613906 rs6438013 rs6563855 rs6584061 rs6590725 rs6606874 rs6629448 rs6641825 rs6731269 rs6747946 rs6750986 rs6767104 rs6772001 rs678483 rs6789667 rs6823473 rs6859120 rs6892802 rs6961503 rs6970785 rs698252 rs6997885 rs7003908 rs7023913 rs7034006 rs7046442 rs7051301 rs7065033 rs7103131 rs7118144 rs7140271 rs7142055 rs7145672 rs7155335 rs7171366 rs7175782 rs7205016 rs7210702 rs7256412 rs7294593 rs7299473 rs733327 rs7347681 rs7388704 rs739666 rs7420125 rs7448571 rs7539694 rs7558478 rs7598670 rs7623157 rs7634647 rs7635505 rs7652953 rs7709951 rs7830593 rs7830759 rs7852245 rs790446 rs7973073 rs7993403 rs7999250 rs8018580 rs8027309 rs8036260 rs8064924 rs8096605 rs828869 rs852523 rs914926 rs9294160 rs9300218 rs9305946 rs931885 rs9327877 rs946252 rs9513367 rs961324 rs9632500 rs9825114 rs9848965 rs9856624 rs988675 rs9952775"
   : [1] "rs10002767 rs10067377 rs10069971 rs10081602 rs10092295 rs1011631 rs1012049 rs10134488 rs10260614 rs1026952 rs1028157 rs1028717 rs10417587 rs10418716 rs10455256 rs10459096 rs10463071 rs10471186 rs10485186 rs10498261 rs10505358 rs10509470 rs10510640 rs10735900 rs10743138 rs10745970 rs10747935 rs10751198 rs10773019 rs10773298 rs10783780 rs10827747 rs10837001 rs10871565 rs10876808 rs10880668 rs10889756 rs10919147 rs10923243 rs10934483 rs10954947 rs10955576 rs10955842 rs11019002 rs11036136 rs11036671 rs11039339 rs11066173 rs11103951 rs11111055 rs11127817 rs1115355 rs11183575 rs11183847 rs11207307 rs11208476 rs11208514 rs11209143 rs11578572 rs11579421 rs11586489 rs11611788 rs11617701 rs11639964 rs11642528 rs11647019 rs11649996 rs11666341 rs11668071 rs11693836 rs11714019 rs11717337 rs11735374 rs11736418 rs1176363 rs11769073 rs11774868 rs11805987 rs11812710 rs11826637 rs11847580 rs11868175 rs11893974 rs11929794 rs11949431 rs12035884 rs12070042 rs12074902 rs12082064 rs12121955 rs1218095 rs12307445 rs12409953 rs12420889 rs12444207 rs12448148 rs12472264 rs12478512 rs12501237 rs12513059 rs12563198 rs12569902 rs12577341 rs12594534 rs12597499 rs12605781 rs12621811 rs12630815 rs12636704 rs12641788 rs12667006 rs12682277 rs12800562 rs12899461 rs12950420 rs12960119 rs13014473 rs13112145 rs13112623 rs13123545 rs13169879 rs13171172 rs13181306 rs1318296 rs13216122 rs13252528 rs13325291 rs13379776 rs13408531 rs1341680 rs1371544 rs1380108 rs1388452 rs1389800 rs1395891 rs1432327 rs1434545 rs1439535 rs1470465 rs1479397 rs1493088 rs150294 rs1505219 rs1509083 rs1509537 rs1522132 rs1564241 rs1566557 rs159228 rs1628854 rs1634479 rs1674729 rs16822696 rs16838078 rs16838677 rs16839483 rs16845000 rs16885247 rs16892685 rs16892729 rs16902328 rs16907106 rs16914850 rs16918895 rs1693663 rs16950116 rs16963394 rs16964618 rs16970687 rs16994051 rs16995641 rs17009882 rs17018414 rs17021145 rs17021825 rs17025482 rs17027938 rs17030742 rs17042107 rs17047489 rs17059403 rs17078877 rs17091704 rs17099872 rs17109726 rs17113072 rs17135626 rs17157802 rs17169630 rs17184090 rs17213264 rs17238052 rs1730633 rs1734907 rs17365336 rs1736867 rs17392154 rs17393434 rs17424278 rs17619600 rs17631231 rs17664384 rs17677886 rs17678153 rs17701996 rs17716105 rs17779253 rs17837692 rs1791909 rs1792525 rs1796937 rs1798911 rs1804025 rs1823762 rs1835655 rs1847022 rs185123 rs1874565 rs1890547 rs1922551 rs195077 rs1960715 rs1997909 rs2041644 rs2061873 rs2113316 rs2131887 rs2164161 rs2174391 rs2213842 rs2242496 rs2252814 rs2276684 rs2284759 rs2287929 rs2298261 rs229835 rs2300179 rs2302332 rs2304136 rs232253 rs2354863 rs2356746 rs2369089 rs238495 rs2395983 rs2399009 rs2400194 rs2415755 rs242724 rs2437802 rs2448191 rs246690 rs2489715 rs249660 rs2515062 rs2570095 rs2575632 rs2591933 rs2596914 rs2618063 rs2627813 rs263734 rs2706464 rs2727165 rs274559 rs277061 rs2786229 rs2809935 rs2816632 rs282258 rs2831208 rs28579689 rs2867048 rs2892383 rs2896850 rs2898407 rs3016176 rs3016752 rs3094395 rs3184504 rs3213928 rs340157 rs34121035 rs34457142 rs344931 rs34585198 rs354518 rs35594730 rs35612996 rs359980 rs3767026 rs3792074 rs3794392 rs3798939 rs3799458 rs3805463 rs3806218 rs3807147 rs3811417 rs3905886 rs3922732 rs3936219 rs4030594 rs4072680 rs4077312 rs4083173 rs4129945 rs4131991 rs4256444 rs4256466 rs4269090 rs429102 rs4317218 rs4332109 rs4405980 rs4414954 rs4419750 rs4422405 rs4466024 rs4470566 rs4479556 rs4523152 rs4529911 rs4603754 rs4618543 rs4638625 rs4642852 rs4647731 rs4648793 rs4655383 rs4656588 rs4675174 rs4678030 rs4678192 rs4688813 rs4699665 rs4699891 rs4735337 rs4740125 rs4756580 rs4760810 rs4780334 rs4792886 rs4834711 rs4860078 rs4862073 rs4862528 rs4865187 rs4892127 rs4932304 rs4946788 rs4951329 rs4962257 rs4965799 rs4974961 rs4975154 rs4980833 rs499974 rs514438 rs530590 rs532731 rs536116 rs548598 rs559665 rs571898 rs5945193 rs5973884 rs604045 rs6424572 rs6446166 rs6449873 rs6485440 rs650440 rs651159 rs6511828 rs6554743 rs6571305 rs6660036 rs6661853 rs6677107 rs6680773 rs6694935 rs6695540 rs6695853 rs670821 rs6738488 rs6739779 rs6750206 rs6765009 rs6788853 rs6793416 rs6824666 rs6846198 rs6860871 rs687578 rs6908310 rs6910046 rs6982764 rs6987055 rs6989728 rs7003452 rs7009774 rs7010796 rs7054689 rs7063059 rs7102109 rs7109235 rs7113382 rs7113554 rs711540 rs7132012 rs7133142 rs7197245 rs7212298 rs722024 rs7226224 rs7254953 rs7300655 rs7312593 rs7315397 rs7320806 rs739742 rs7440269 rs744908 rs7471812 rs747451 rs749981 rs7517754 rs7522356 rs7523055 rs7524430 rs7529073 rs753891 rs7540474 rs7543834 rs7560409 rs7579936 rs7621543 rs7649308 rs7651707 rs7686452 rs7694663 rs7696759 rs7717089 rs7729195 rs7734004 rs7735633 rs7736417 rs7746031 rs7764524 rs777016 rs7771567 rs777827 rs779562 rs7820168 rs7862217 rs7882367 rs7909723 rs7934904 rs7936750 rs7952758 rs7953290 rs7964120 rs7980012 rs7984685 rs8027320 rs803223 rs8035089 rs8035342 rs8057892 rs8079695 rs815802 rs816353 rs823036 rs838425 rs850517 rs867316 rs869026 rs920980 rs9303255 rs9305018 rs9319336 rs9327706 rs934397 rs9354993 rs936525 rs9375604 rs9384847 rs943551 rs9459893 rs9494412 rs9529418 rs9579762 rs9637625 rs966867 rs968845 rs970694 rs9733640 rs9812103 rs9828770 rs9833058 rs9836404 rs9844222 rs9861780 rs989925 rs9941008 rs9999251"
 
-* Summary
 
-  The Canadian and Spanish genotypes are 99% the same, and for the overlap that exists between their markers they are completely identical. So... why do these two datasets, which describe the same set of individuals, have 300 extra markers in the Spanish and 500 in the Canadian?
+** Summary
+
+   The Canadian and Spanish genotypes are 99% the same, and for the overlap that exists between their markers they are completely identical. So... why do these two datasets, which describe the same set of individuals, have 300 extra markers in the Spanish and 500 in the Canadian?
+
+   I spoke with Mallory <2020-06-16 Tue>, and she said that the overlap was indeed strange but that's how the files were given to her. I very well may have been the last person to touch this project, so it could have been something I may have done previously, a previous merging of these datasets...
+
+   On the other hand, it could be that these families were genotyped together _twice_, in which case the fact that the genotypes for the overlapping markers have perfect matches, this adds a large amount of credibility to these genotypes (although the NC calls being consistent would be strange, unless the DNA in those regions were genuinely hard to genotype).
   
 
+* Merging the genotypes file
 
+  #+CALL: loadgenos1()
+
+  #+RESULTS:
+
+  #+begin_src R :session ones
+  # we've loaded the Spanish and Canadian genotypes already
+  tab.british <- tableau('~/work/linkage/raw_copy/British/genotypes', header=T)
+  #+end_src
+
+  #+RESULTS:
+
+  #+begin_src R :session ones :results output
+  markers.british <- rownames(tab.british)
+  markers.spanish <- rownames(tab.spanish)
+  markers.canadian <- rownames(tab.canada)
+  length(markers.british)
+  length(markers.spanish)
+  length(markers.canadian)
+  #+end_src
+
+  #+RESULTS:
+  : [1] 712726
+  : [1] 298006
+  : [1] 298220
+
+  The british have the most markers, followed by canadian, and then spanish. So that will be the (reverse) order used to subselect one from the other.
+
+  #+begin_src R :session ones :results output
+
+  intersect.do <- function(big,med,sml) {
+     medNbig <- med[med %in% big]
+     smlNmed <- sml[sml %in% med]
+     bigNmedNsml <- smlNmed[smlNmed %in% medNbig]
+     return(sort(bigNmedNsml))
+  }
+
+  # intersect in different ways, should be the same, but good to check
+  inters = c()
+  inters[[1]] <- intersect.do(markers.british, markers.canadian, markers.spanish)
+  inters[[2]] <- intersect.do(markers.british, markers.spanish, markers.canadian)
+  inters[[3]] <- intersect.do(markers.canadian, markers.british, markers.spanish)
+  inters[[4]] <- intersect.do(markers.canadian, markers.spanish, markers.british)
+  inters[[5]] <- intersect.do(markers.spanish, markers.british, markers.canadian)
+  inters[[6]] <- intersect.do(markers.spanish, markers.canadian, markers.british)
+  
+  # All the same length?
+  sapply(inters, length)
+
+  # All the same markers?
+  all(inters[[1]] == inters[[2]])
+  all(inters[[3]] == inters[[4]])
+  all(inters[[5]] == inters[[6]])
+  all(inters[[1]] == inters[[4]])
+  all(inters[[1]] == inters[[6]])
+  
+  #+end_src
+
+  #+RESULTS:
+  : [1] 214563 214563 214563 214563 214563 214563
+  : [1] TRUE
+  : [1] TRUE
+  : [1] TRUE
+  : [1] TRUE
+  : [1] TRUE
+
+  Yep, all the same (when sorted). We'll pick one and use that on all three datasets and then merge them.
+
+  #+begin_src R :session ones :results output
+  common <- inters[[1]]
+  ## Filter rows
+  mat.canada <- tab.canada[common,]
+  mat.british <- tab.british[common,]
+  mat.spanish <- tab.spanish[common,]
+  ## Merge
+  mat.merged <- data.frame(mat.canada, mat.british, mat.spanish, check.names=T, check.rows=T)
+  dim(mat.merged)
+  sort(colnames(mat.merged))
+  #+end_src
+
+  #+RESULTS:
+  #+begin_example
+  [1] 214563    129
+    [1] "X2001"   "X2001.1" "X2002"   "X2002.1" "X2003"   "X2003.1" "X2004"  
+    [8] "X2004.1" "X2005"   "X2005.1" "X2006"   "X2006.1" "X2007"   "X2007.1"
+   [15] "X2008"   "X2008.1" "X2009"   "X2009.1" "X2010"   "X2010.1" "X2011"  
+   [22] "X2011.1" "X2012"   "X2012.1" "X2013"   "X2013.1" "X2014"   "X2014.1"
+   [29] "X2015"   "X2015.1" "X2016"   "X2016.1" "X2017"   "X2017.1" "X2018"  
+   [36] "X2018.1" "X2019"   "X2019.1" "X2020"   "X2020.1" "X2021"   "X2021.1"
+   [43] "X2022"   "X2022.1" "X2023"   "X2023.1" "X2024"   "X2024.1" "X2025"  
+   [50] "X2025.1" "X2026"   "X2026.1" "X2027"   "X2027.1" "X2028"   "X2028.1"
+   [57] "X2029"   "X2029.1" "X2030"   "X2030.1" "X2031"   "X2031.1" "X2032"  
+   [64] "X2032.1" "X2033"   "X2033.1" "X2034"   "X2034.1" "X2035"   "X2035.1"
+   [71] "X2036"   "X2036.1" "X2037"   "X2037.1" "X2038"   "X2038.1" "X2039"  
+   [78] "X2039.1" "X2040"   "X2040.1" "X2041"   "X2041.1" "X2042"   "X2042.1"
+   [85] "X2043"   "X2043.1" "X2044"   "X2044.1" "X2045"   "X2045.1" "X2046"  
+   [92] "X2046.1" "X2047"   "X2047.1" "X2048"   "X2048.1" "X2049"   "X2049.1"
+   [99] "X2050"   "X2050.1" "X2051"   "X2051.1" "X2052"   "X2052.1" "X2053"  
+  [106] "X2053.1" "X2054"   "X2054.1" "X2055"   "X2055.1" "X2056"   "X2056.1"
+  [113] "X2057"   "X2057.1" "X2058"   "X2058.1" "X2059"   "X2059.1" "X2060"  
+  [120] "X2060.1" "X21"     "X22"     "X32"     "X35"     "X44"     "X57"    
+  [127] "X61"     "X79"     "X97"
+  #+end_example
+
+  So we have 129 genotypes, of which some are duplicates (from the Canadian and Spanish) genotypes file. We should check that the ".1" name have identical genotypes and then remove them. (Yes we already know they're identical from before, but better safer than sorry).
+
+  #+begin_src R :session ones :results output
+  names.merged <- colnames(mat.merged)
+  names.dupes.bool <- sapply(names.merged, function(x){endsWith(x,".1")})
+  names.dupes <- names.merged[names.dupes.bool]
+ 
+  sapply(names.dupes, function(dupers){
+      namers <- strsplit(dupers, split="\\.1")[[1]]
+      ## 
+      vec.dupes <- mat.merged[,dupers]
+      vec.names <- mat.merged[,namers]
+      ## 
+      return(all(vec.dupes == vec.names))
+  })
+  #+end_src
+
+  #+RESULTS:
+  #+begin_example
+  X2001.1 X2002.1 X2003.1 X2004.1 X2005.1 X2006.1 X2007.1 X2008.1 X2009.1 X2010.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
+  X2011.1 X2012.1 X2013.1 X2014.1 X2015.1 X2016.1 X2017.1 X2018.1 X2019.1 X2020.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
+  X2021.1 X2022.1 X2023.1 X2024.1 X2025.1 X2026.1 X2027.1 X2028.1 X2029.1 X2030.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
+  X2031.1 X2032.1 X2033.1 X2034.1 X2035.1 X2036.1 X2037.1 X2038.1 X2039.1 X2040.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
+  X2041.1 X2042.1 X2043.1 X2044.1 X2045.1 X2046.1 X2047.1 X2048.1 X2049.1 X2050.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
+  X2051.1 X2052.1 X2053.1 X2054.1 X2055.1 X2056.1 X2057.1 X2058.1 X2059.1 X2060.1 
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  #+end_example
+  
+  
+  Yep, identical genotypes for all duplicate individuals -- let's remove them.
+
+  #+begin_src R :session ones :results output
+  mat.merged.nodupes <- mat.merged[,!names.dupes.bool]
+  dim(mat.merged.nodupes)
+  colnames(mat.merged.nodupes)
+  #+end_src
+
+  #+RESULTS:
+  : [1] 214563     69
+  :  [1] "X2001" "X2002" "X2003" "X2004" "X2005" "X2006" "X2007" "X2008" "X2009"
+  : [10] "X2010" "X2011" "X2012" "X2013" "X2014" "X2015" "X2016" "X2017" "X2018"
+  : [19] "X2019" "X2020" "X2021" "X2022" "X2023" "X2024" "X2025" "X2026" "X2027"
+  : [28] "X2028" "X2029" "X2030" "X2031" "X2032" "X2033" "X2034" "X2035" "X2036"
+  : [37] "X2037" "X2038" "X2039" "X2040" "X2041" "X2042" "X2043" "X2044" "X2045"
+  : [46] "X2046" "X2047" "X2048" "X2049" "X2050" "X2051" "X2052" "X2053" "X2054"
+  : [55] "X2055" "X2056" "X2057" "X2058" "X2059" "X2060" "X21"   "X22"   "X44"  
+  : [64] "X32"   "X61"   "X79"   "X57"   "X35"   "X97"
+  
+  Okay, we have a fully merged matrix. Let's write it out
+
+  #+begin_src bash
+  mkdir -p ~/work/linkage/preprocessed
+  #+end_src
+
+  #+RESULTS:
+
+  #+begin_src R :session ones 
+  # Write genotypes
+  write.table(mat.merged.nodupes, file="~/work/linkage/preprocessed/genotypes", 
+              quote=F, sep="\t", col.names = NA)
+  #+end_src
+
+  #+RESULTS:
+
+** Write MAF  
+
+   The minor allele frequency file should also be written from the set of markers we have. We will assume all markers have a MAF of 0.5
+
+   #+begin_src R :session ones
+   cnames <- rownames(mat.merged.nodupes)
+   maf <- data.frame(Name=cnames, Freq=rep(0.5,length(cnames)))
+   write.table(maf, file="~/work/linkage/preprocessed/maf.txt", quote=F, sep="\t", row.names=F)
+   #+end_src
+
+   #+RESULTS:
+
+
+* Pedigree 
+
+  I will rely on the pedfiles given to me, since I have no way of verifying the pedigrees myself. The family names will be prefixed with '118' and suffixed with '1' '2' or '3' depending for Canadian, Spanish, and British.
+
+
+** Canadian
+
+  #+begin_src text :padline no :tangle ~/work/linkage/preprocessed/pedfile.pro
+  1181	76211	0	0	1	1
+  1181	2037	0	0	2	1
+  1181	2033	76211	2037	1	1
+  1181	76222	0	0	2	1
+  1181	2036	2033	76222	1	1
+  1181	2035	2033	76222	1	1
+  1181	2034	76211	2037	1	2
+  1181	2032	76211	2037	2	1
+  1181	76213	0	0	1	1
+  1181	2026	76213	2032	1	1
+  1181	2030	76211	2037	2	1
+  1181	76215	0	0	1	1
+  1181	2028	76215	2030	2	1
+  1181	2027	76215	2030	1	1
+  1181	2029	0	0	1	1
+  1181	2031	76211	2037	2	1
+  1181	2024	2029	2031	2	1
+  1181	2025	2029	2031	1	2
+  #+end_src
+
+
+** Spanish
+
+  #+begin_src text :padline no :tangle ~/work/linkage/preprocessed/pedfile.pro
+  1182	76111	0	0	1	1
+  1182	76112	0	0	2	1
+  1182	76121	0	0	1	1
+  1182	2021	76111	76112	2	1
+  1182	2022	76111	76112	1	2
+  1182	2020	76121	2021	1	2
+  1182	76123	0	0	1	1
+  1182	2023	76123	2021	1	2
+  #+end_src
+
+
+** British
+
+  #+begin_src text :padline no :tangle ~/work/linkage/preprocessed/pedfile.pro
+  1183	7623	0	0	1	1
+  1183	7624	0	0	2	1
+  1183	32	7623	7624	2	1
+  1183	22	7623	7624	2	1
+  1183	20	0	0	1	1
+  1183	44	0	0	1	1
+  1183	79	20	32	1	2
+  1183	61	20	32	1	2
+  1183	35	44	22	2	1
+  1183	57	0	0	1	1
+  1183	97	57	35	1	2
+  #+end_src
+
+** Consistency check
+
+   Let's export the three tables into the same file and see if there any repeat individuals, and that the parents match. Lisp is good for this.
+
+   #+begin_src elisp :results value 
+          (let ((mapped-file nil))
+            (with-current-buffer "pedfile.pro"
+              (goto-char (point-min))
+              ;; Parse file
+              (while (not (eobp))
+                (let* ((lvals (--map (string-to-number it)
+                                     (split-string
+                                      (buffer-substring-no-properties
+                                       (point)
+                                       (progn (forward-line 1) (point)))
+                                      "[	 ]" nil "[ \n]")))
+                       (entry (list (cadr lvals) ;; id -- alist
+                                    :family (car lvals)
+                                    :father (nth 2 lvals) :mother (nth 3 lvals)
+                                    :gender (cond ((eq (nth 4 lvals) 0) 'unknown)
+                                                  ((eq (nth 4 lvals) 1) 'male)
+                                                  ((eq (nth 4 lvals) 2) 'female)
+                                                  (t (user-error "Gender error")))
+                                    :affect (cond ((eq (nth 5 lvals) 0) 'unknown)
+                                                  ((eq (nth 5 lvals) 1) 'yes)
+                                                  ((eq (nth 5 lvals) 2) 'no)
+                                                  (t (user-error "affected error"))))))
+                  (push entry mapped-file))))
+            ;; check duplicate ids
+            (let* ((ids (mapcar 'identity mapped-file))
+                   (lenids (length ids))
+                   (uniqids (-uniq ids))
+                   (lenuniq (length uniqids)))
+              (unless (eq lenids lenuniq)
+                (user-error "Id's in pedfile are not unique: %s"
+                            (-difference ids uniqids))))
+            ;; Check gender and parentage
+            (cl-labels ((checkparent (idp relation)
+                                     (let* ((id-data (alist-get idp mapped-file))
+                                            (gender (plist-get id-data :gender)))
+                                       (if (eq 0 idp)
+                                           (format "no %s as expected." relation)
+                                         (unless id-data
+                                           (user-error "%id: %d (%s) does not exist "
+                                                       id idp relation))
+                                         (cond ((and (eq relation 'mother)
+                                                     (not (eq gender 'female)))
+                                                (user-error "%d: %d (%s) is not female, but %s"
+                                                            id idp relation gender))
+                                               ((and (eq relation 'father)
+                                                     (not (eq gender 'male)))
+                                                (user-error "%d: %d (%s) is not male, but %s"
+                                                            id idp relation gender))
+                                               (t (format "%d (%s,%s) clear"
+                                                          idp relation gender)))))))
+              ;; recursion would be expensive, simple loop would suffice
+              (let ((res nil))
+                (dolist (entry mapped-file (message (mapconcat 'identity res "\n")))
+                  (let ((id (car entry))
+                         (mother (plist-get (cdr entry) :mother))
+                         (father (plist-get (cdr entry) :father)))
+                    (push (format "%d\t%s\t%s" id
+                                  (checkparent mother 'mother)
+                                  (checkparent father 'father))
+                          res))))))
+   #+end_src
+
+   #+RESULTS:
+   #+begin_example
+   76211	no mother as expected.	no father as expected.
+   2037	no mother as expected.	no father as expected.
+   2033	2037 (mother,female) clear	76211 (father,male) clear
+   76222	no mother as expected.	no father as expected.
+   2036	76222 (mother,female) clear	2033 (father,male) clear
+   2035	76222 (mother,female) clear	2033 (father,male) clear
+   2034	2037 (mother,female) clear	76211 (father,male) clear
+   2032	2037 (mother,female) clear	76211 (father,male) clear
+   76213	no mother as expected.	no father as expected.
+   2026	2032 (mother,female) clear	76213 (father,male) clear
+   2030	2037 (mother,female) clear	76211 (father,male) clear
+   76215	no mother as expected.	no father as expected.
+   2028	2030 (mother,female) clear	76215 (father,male) clear
+   2027	2030 (mother,female) clear	76215 (father,male) clear
+   2029	no mother as expected.	no father as expected.
+   2031	2037 (mother,female) clear	76211 (father,male) clear
+   2024	2031 (mother,female) clear	2029 (father,male) clear
+   2025	2031 (mother,female) clear	2029 (father,male) clear
+   76111	no mother as expected.	no father as expected.
+   76112	no mother as expected.	no father as expected.
+   76121	no mother as expected.	no father as expected.
+   2021	76112 (mother,female) clear	76111 (father,male) clear
+   2022	76112 (mother,female) clear	76111 (father,male) clear
+   2020	2021 (mother,female) clear	76121 (father,male) clear
+   76123	no mother as expected.	no father as expected.
+   2023	2021 (mother,female) clear	76123 (father,male) clear
+   7623	no mother as expected.	no father as expected.
+   7624	no mother as expected.	no father as expected.
+   32	7624 (mother,female) clear	7623 (father,male) clear
+   22	7624 (mother,female) clear	7623 (father,male) clear
+   20	no mother as expected.	no father as expected.
+   44	no mother as expected.	no father as expected.
+   79	32 (mother,female) clear	20 (father,male) clear
+   61	32 (mother,female) clear	20 (father,male) clear
+   35	22 (mother,female) clear	44 (father,male) clear
+   57	no mother as expected.	no father as expected.
+   97	35 (mother,female) clear	57 (father,male) clear
+   #+end_example
+
+   
+   Okay, pedigree appears to have no duplicates, and all parents appear to exist and have the right genders.
+
+* Summary
+
+  We can now proceed with the actual linkage analysis (tomorrow) <2020-06-19 Fri>
