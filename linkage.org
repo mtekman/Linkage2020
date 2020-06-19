@@ -530,6 +530,660 @@
    
    Okay, pedigree appears to have no duplicates, and all parents appear to exist and have the right genders.
 
-* Summary
 
-  We can now proceed with the actual linkage analysis (tomorrow) <2020-06-19 Fri>
+* Map file
+
+  + Canada & Spain :: Infinium Multi Ethnic Global BeadChip (1779819 markers)
+  + England :: Omni-X-24 BeadChip (741000 markers)
+
+
+  Interesting, Canada and Spain actually had the smaller number of markers than the British and yet they came from a larger chip.
+
+  Anyway, we will need to download the map files for each chip, check the marker overlap and check that marker physical positions make sense. Otherwise we'll need to pick a side.
+
+** Infinium Multi Ethnic Global Beadchip
+
+   The [[https://www.illumina.com/search.html?q=Infinium%20Multi%20Ethnic%20Global&filter=all&p=1][closest match]] only offers a PDF for the Beadchip, but no specific map files. I would guess that "Infinium Multi Ethnic Global Beadchip" is part of the "Infinium Multi Ethnic Global" Kit, so that is what [[https://support.illumina.com/downloads/infinium-multi-ethnic-global-8-v1-support-files.html][I went with]]. The file chosen was "Infinium Multi-Ethnic Global-8 v1.0 Physical and Genetic Coordinates" but two builds were offered: hg19 and hg38. 
+
+   The linkage plotting tools only have chromosome map for hg18 and hg19, so I opted to download the hg19 for compatibility.
+
+   #+begin_src sh :session ones :results value
+   wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/multiethnic-global/multi-ethnic-global-8-d1-physical-and-genetic-coordinates.zip -O ~/work/linkage/map/multi-ethnic-global-8-d1-physical-genetic-coordinates.zip
+   cd ~/work/linkage/map/
+   unzip multi-ethnic-global-8-d1-physical-genetic-coordinates.zip
+   ls
+   #+end_src
+
+   #+RESULTS:
+   | InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt |   |   |
+   | infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip       |   |   |
+   | multi-ethnic-global-8-d1-physical-genetic-coordinates.zip              |   |   |
+   | Multi-EthnicGlobal_D1.csv_Physical-and-Genetic-Coordinates.txt         |   |   |
+   | ps.png                                                                 |   |   |
+
+   A quick peek:
+   #+NAME: peek
+   #+begin_src sh :session ones :var name=""
+   head -1 $name
+   cat $name | grep "^rs" | head | cut -f 1-10
+   #+end_src
+
+   #+CALL: peek(name="Multi-EthnicGlobal_D1.csv_Physical-and-Genetic-Coordinates.txt")
+
+
+   #+RESULTS:
+   | Name       | Chr |   MapInfo | deCODE(cM) |
+   | rs10000008 |   4 | 172776204 |   166.8903 |
+   | rs10000011 |   4 | 138223055 |   133.7645 |
+   | rs10000030 |   4 | 103374154 |   107.4204 |
+   | rs1000003  |   3 |  98342907 |   111.7517 |
+   | rs10000056 |   4 | 189321617 |   203.1508 |
+   | rs1000007  |   2 | 237752054 |   249.0087 |
+   | rs10000073 |   4 |  43022222 |    63.9959 |
+   | rs10000092 |   4 |  21895517 |     37.309 |
+   | rs1000014  |  16 |  24417536 |     47.977 |
+   | rs1000016  |   2 | 235690982 |   244.3528 |
+
+   A quick check on UCSC for:
+
+   + hg38:
+     + rs1000016
+       + Position: chr2:234782338-234782338 (does not match)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr2&l=234782237&r=234782438&o=234782337&t=234782338&g=dbSnp153Common&i=rs1000016][Link]]
+     + rs1000014
+       + Position: chr16:24406215-24406215 (does not match)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr16&l=24406114&r=24406315&o=24406214&t=24406215&g=dbSnp153Common&i=rs1000014][Link]]
+   + hg37:
+     + rs1000016
+       + Position: chr2:235690982-235690982  (matches table)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr2&l=235690881&r=235691082&o=235690981&t=235690982&g=dbSnp153Common&i=rs1000016][Link]]
+     + rs1000014
+       + Position: chr16:24417536-24417536 (matches table)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr16&l=24417435&r=24417636&o=24417535&t=24417536&g=dbSnp153Common&i=rs1000014][Link]]
+
+   So I am reasonably confident this map file is hg19/hg37
+
+  
+** Omni-X-24 BeadChip
+
+   The [[https://support.illumina.com/downloads/infinium-omniexpress-24-v1-3-support-files.html][closest match]] was the OmniExpress-24, and the file chosen was the "Infinium OmniExpress-24 v1.3 Physical and Genetic Coordinates" but no genome was given.
+
+   #+begin_src sh :session ones
+   wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/humanomniexpress-24/v1-3/infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip -O ~/work/linkage/map/infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip
+   cd ~/work/linkage/map/
+   unzip infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip
+   ls
+   #+end_src
+
+   #+RESULTS:
+   | InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt | multi-ethnic-global-8-d1-physical-genetic-coordinates.zip      | 
+   | infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip       | Multi-EthnicGlobal_D1.csv_Physical-and-Genetic-Coordinates.txt |
+
+   #+CALL: peek(name="InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt")
+
+   #+RESULTS:
+   | Name       | Chr |   MapInfo | deCODE(cM) |
+   | rs10000911 |   4 | 144136193 |     140.08 |
+   | rs10000988 |   4 |  76010255 |     85.247 |
+   | rs10002181 |   4 | 142250415 |    138.919 |
+   | rs10003721 |   4 |  74440784 |    83.5039 |
+   | rs10005140 |   4 |  22365603 |    37.6755 |
+   | rs10005242 |   4 |   5949558 |    10.9662 |
+   | rs10010434 |   4 |   2701540 |     3.5678 |
+   | rs10011256 |   4 | 110792907 |    113.594 |
+   | rs1001131  |   2 | 115010406 |   126.4217 |
+   | rs10011926 |   4 | 111026927 |   113.8203 |
+
+   A quick check on UCSC for:
+
+   * hg38:
+     + rs10002181:
+       + Position: chr4:141329261-141329261 (does not match)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr4&l=141329160&r=141329361&o=141329260&t=141329261&g=dbSnp153Common&i=rs10002181][Link]]
+     + rs10011926:
+       + Position: chr4:110105771-110105771 (does not match)
+       + [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr4&l=110105720&r=110105821&o=110105770&t=110105771&g=dbSnp153Common&i=rs10011926][Link]]
+
+   * hg37:
+     + rs10002181:
+       - Position: chr4:142250415-142250415 (matches table)
+       - [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr4&l=142250164&r=142250665&o=142250414&t=142250415&g=dbSnp153Common&i=rs10002181][Link]]
+     + rs10011926
+       - Position: chr4:111026927-111026927 (matches table)
+       - [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr4&l=111026876&r=111026977&o=111026926&t=111026927&g=dbSnp153Common&i=rs10011926][Link]]
+
+         
+   So I am reasonably confident this map file is hg19.
+
+** Combining Maps   
+
+   We currently have two hg19 marker maps and we want to merge them on common marker names and positions. R is better suited for this:
+
+   #+begin_src R :session yarr 
+     tableau <- function(name, ...) {
+       read.table(name, stringsAsFactors=F, row.names=1, ...)
+     }
+
+     map.omnix <- tableau('~/work/linkage/map/InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt', header=T)
+     map.global <- tableau('~/work/linkage/map/Multi-EthnicGlobal_D1.csv_Physical-and-Genetic-Coordinates.txt', header=T)
+     common.markers <- rownames(tableau('~/work/linkage/preprocessed/maf.txt', header=T))
+
+   #+end_src
+
+   #+RESULTS:
+   
+   Peek at each file:
+
+   #+begin_src R :session yarr :results output
+     dim(map.omnix)
+     dim(map.global)
+     length(common.markers)
+     ## peek
+     head(map.omnix)
+     head(map.global)
+     head(common.markers)
+   #+end_src
+
+   #+RESULTS:
+   #+begin_example
+   [1] 714238      3
+   [1] 1748250       3
+   [1] 214563
+              Chr   MapInfo deCODE.cM.
+   rs10000911   4 144136193   140.0800
+   rs10000988   4  76010255    85.2470
+   rs10002181   4 142250415   138.9190
+   rs10003721   4  74440784    83.5039
+   rs10005140   4  22365603    37.6755
+   rs10005242   4   5949558    10.9662
+                       Chr   MapInfo deCODE.cM.
+   10:100012219-GT      10 100012219   118.9888
+   10:100013340-CT      10 100013340   118.9910
+   10:100013459-TCTC-T  10 100013459   118.9912
+   10:100013467-GA      10 100013467   118.9912
+   10:100015474-GA      10 100015474   118.9951
+   10:100016685-CT      10 100016685   118.9974
+   [1] "rs1000002"  "rs1000003"  "rs10000030" "rs10000037" "rs10000041"
+   [6] "rs1000007"
+   #+end_example
+
+   700k markers in the omnix, and 1.7M markers in the global, with 200k markers from our genotypes.
+
+   The =common.markers= were derived from the markers given in the maf.txt file (which was derived from our combined genotypes file). We will now subselect these markers from each map before intersecting.
+
+   #+begin_src R :session yarr :results output
+     map.omnix.sub <- map.omnix[rownames(map.omnix) %in% common.markers,]
+     map.global.sub <- map.global[rownames(map.global) %in% common.markers,]
+     dim(map.omnix.sub)
+     dim(map.global.sub)
+   #+end_src
+
+   #+RESULTS:
+   : [1] 211729      3
+   : [1] 117708      3
+
+   700k to 200k in the omnix, and 1.7M to 117k in the global. Let's intersect.
+
+*** Intersection
+
+   First, we subselect the global from the omnix
+
+   #+begin_src R :session yarr :results output
+     map.intersect1 <- map.global.sub[rownames(map.global.sub) %in% rownames(map.omnix.sub),]
+     dim(map.intersect1)
+     head(map.intersect1)
+   #+end_src
+
+   #+RESULTS:
+   : [1] 116641      3
+   :            Chr   MapInfo deCODE.cM.
+   : rs10000030   4 103374154   107.4204
+   : rs1000003    3  98342907   111.7517
+   : rs1000007    2 237752054   249.0087
+   : rs1000016    2 235690982   244.3528
+   : rs10000180   4  83899764    90.5530
+   : rs10000272   4 189690383   204.0179
+
+   and now we subselect the omnix from the global. (The purpose of this is to see if we get the same map, and to see if the physical and cM positions agree across maps for the same markers).
+
+   #+begin_src R :session yarr :results output
+     map.intersect2 <- map.omnix.sub[rownames(map.omnix.sub) %in% rownames(map.global.sub),]
+     dim(map.intersect2)
+     head(map.intersect2)
+   #+end_src
+
+   #+RESULTS:
+   : [1] 116641      3
+   :            Chr   MapInfo deCODE.cM.
+   : rs1001131    2 115010406   126.4217
+   : rs10068316   5   5938780    15.9405
+   : rs10466408  11  12839527    21.8288
+   : rs10485597  20  20239050    49.4944
+   : rs10488810  11  35213378    51.6996
+   : rs10788162  10 123037309   145.1604
+
+   Same number of markers as before, but I guess the order of markers is different. Let's do a quick sort of both
+
+*** Consistency check (small)
+
+   #+begin_src R :session yarr :results output
+     head(map.intersect1[order(rownames(map.intersect1)),])
+     head(map.intersect2[order(rownames(map.intersect2)),])
+   #+end_src
+
+   #+RESULTS:
+   #+begin_example
+              Chr   MapInfo deCODE.cM.
+   rs1000003    3  98342907   111.7517
+   rs10000030   4 103374154   107.4204
+   rs1000007    2 237752054   249.0087
+   rs1000016    2 235690982   244.3528
+   rs10000180   4  83899764    90.5530
+   rs10000272   4 189690383   204.0179
+              Chr   MapInfo deCODE.cM.
+   rs1000003    3  98342907   111.7517
+   rs10000030   4 103374154   107.4204
+   rs1000007    2 237752054   249.0087
+   rs1000016    2 235690982   244.3528
+   rs10000180   4  83899764    90.5530
+   rs10000272   4 189690383   204.0179
+   #+end_example
+
+   Sorting by marker name gives the same top 10 markers in each file with identical physical and genetic positions. Let's check all markers.  
+
+    #+begin_src R :session yarr :results output
+      all(sort(rownames(map.intersect1)) == sort(rownames(map.intersect2)))
+      length(rownames(map.intersect1))
+    #+end_src
+
+    #+RESULTS:
+    : [1] TRUE
+    : [1] 116641
+
+
+    And now all positions
+
+*** Consistency check (all)
+
+   (Note: this was slow, so I wrote a parallel implementation based on [[https://stackoverflow.com/questions/31050556/parallel-version-of-sapply][this post]], which gave a 3x speedup)
+
+
+   #+begin_src R :session yarr :results output
+     library(parallel)
+     ## An mc-version of the sapply function.
+     mcsapply <- function (X, FUN, ..., simplify = TRUE, USE.NAMES = TRUE) {
+       FUN <- match.fun(FUN)
+       answer <- parallel::mclapply(X = X, FUN = FUN, ...)
+       if (USE.NAMES && is.character(X) && is.null(names(answer))) 
+         names(answer) <- X
+       if (!isFALSE(simplify) && length(answer)) 
+         simplify2array(answer, higher = (simplify == "array"))
+       else answer
+     }
+
+   #+end_src
+
+   #+RESULTS:
+
+   #+begin_src R :session yarr :results output
+     comm.markers <- rownames(map.intersect1)  ## common to both datasets
+     comm.len <- length(comm.markers)
+     i <- 0
+
+     res <- mcsapply(comm.markers, function(marker){
+       rowdata.i1 <- map.intersect1[marker,]
+       rowdata.i2 <- map.intersect2[marker,]
+       i <<- i + 1
+       message(marker, " ", floor(100 * i / comm.len), "  \r", appendLF=F)
+       flush.console()
+       return(all(rowdata.i1 == rowdata.i2))
+     }, mc.cores=3)
+   #+end_src
+
+   #+begin_src R :session yarr :results output
+     summary(res)
+   #+end_src
+
+   #+RESULTS:
+   :    Mode   FALSE    TRUE    NA's 
+   : logical       1  116170     470
+
+   So it looks like 116170 markers were in complete agreement with one another. 470 were not sure (or could not do the comparison) and 1 was flat out wrong.
+
+   Let us look at these outliers and see whether the issue was to do with precision (e.g. 15.1416 vs 15.14159) or something more concerning.
+
+*** Examining Outliers   
+
+**** False Markers
+
+    Let's examine the one False marker
+
+    #+begin_src R :session yarr
+      names(res)[res == FALSE & !(is.na(res))] # need to be explicit
+    #+end_src
+
+    #+RESULTS:
+    : rs2247450
+
+    and now a peek at this marker in both datasets:
+
+    #+NAME: compare1
+    #+begin_src R :session yarr :var name=""
+      rbind(c(name, "intersect1", map.intersect1[name,]),
+            c(name, "intersect2", map.intersect2[name,]),
+            c(name, "omnix", map.omnix[name,]),
+            c(name, "global", map.global[name,]))
+    #+end_src
+
+    #+CALL: compare1(name="rs2247450")
+
+    #+RESULTS:
+    | rs2247450 | intersect1 | 5 | 79381796 | 95.3136 |
+    | rs2247450 | intersect2 | 0 |        0 |      NA |
+    | rs2247450 | omnix      | 0 |        0 |      NA |
+    | rs2247450 | global     | 5 | 79381796 | 95.3136 |
+
+    It looks like this marker does not appear to be defined in the omnix dataset. We will drop it
+
+**** NA Markers
+
+     Let's look at 10 of the 470 undefined markers
+
+     #+begin_src R :session yarr
+       na.markers <- names(res)[is.na(res)]
+       head(na.markers)
+     #+end_src
+
+     #+RESULTS:
+     | rs10436791 |
+     | rs10436793 |
+     | rs10465457 |
+     | rs10465458 |
+     | rs10465469 |
+     | rs1050190  |
+
+     #+CALL: compare1(name="rs10436791")
+
+     #+RESULTS:
+     | rs10436791 | intersect1 | Y | 14518606 | NA |
+     | rs10436791 | intersect2 | Y | 14518606 | NA |
+     | rs10436791 | omnix      | Y | 14518606 | NA |
+     | rs10436791 | global     | Y | 14518606 | NA |
+
+     #+CALL: compare1(name="rs1050190")     
+
+     #+RESULTS:
+     | rs1050190 | intersect1 | 0 | 0 | NA |
+     | rs1050190 | intersect2 | 0 | 0 | NA |
+     | rs1050190 | omnix      | 0 | 0 | NA |
+     | rs1050190 | global     | 0 | 0 | NA |
+
+     Just from comparing the top and bottom marker in that list of 10 we can see that the cM information is NA. 
+
+     This makes sense because for the top marker it is on the Y chromosome for which there is 0 recombination probability (or at least a not yet well-understood probability of a recombination event). 
+
+     For the bottom marker, these have a chromosome of 0..., which I have no idea what that means, but that is also how they are written in the original map files.
+
+**** Summarize Outliers by Chromosome
+
+     Let's summarize the chromosomes of these outliers and see if they are on weird chromosomes. If they are then we can just drop them.
+
+     #+begin_src R :session yarr 
+       markers.outliers <- names(res)[is.na(res) | res==FALSE]
+       source.outliers <- rbind(map.global[markers.outliers,],
+                                map.omnix[markers.outliers,])
+       head(source.outliers)
+     #+end_src
+
+     #+RESULTS:
+     | 5 | 79381796 | 95.3136 |
+     | Y | 14518606 | nil     |
+     | Y | 14266799 | nil     |
+     | Y | 17913958 | nil     |
+     | Y | 19306942 | nil     |
+     | Y |  7796708 | nil     |
+
+     #+begin_src R :session yarr
+       source.chroms <- source.outliers$Chr
+       table(source.chroms)
+     #+end_src
+
+     #+RESULTS:
+     |  0 |  15 |
+     |  5 |   1 |
+     | XY |  12 |
+     |  Y | 914 |
+
+     Most of these undefined markers are on the Y, a few on the '0', a few on the XY overlap, and 1 marker on chr5 (as explored previously).
+
+     Not very useful markers, I will drop these from the map.
+
+**** Removing outliers
+
+     #+begin_src R :session yarr
+       map.nooutliers <- map.intersect1[!(rownames(map.intersect1) %in% markers.outliers),]
+       dim(map.nooutliers)
+     #+end_src
+
+     #+RESULTS:
+     | 116170 |
+     |      3 |
+     
+     and a quick check for NA values:
+
+     #+begin_src R :session yarr
+       table(is.na(map.nooutliers))
+     #+end_src
+
+     #+RESULTS:
+     | FALSE | 348510 |
+
+
+     Good, this is a clean table. 
+
+*** Sort the map
+
+    Order the map by chromosome and then physical position
+
+    #+begin_src R :session yarr :results output
+      ## List of chromosomes
+      sort(unique(map.nooutliers$Chr))
+    #+end_src
+
+    #+RESULTS:
+    :  [1] "1"  "10" "11" "12" "13" "14" "15" "16" "17" "18" "19" "2"  "20" "21" "22"
+    : [16] "3"  "4"  "5"  "6"  "7"  "8"  "9"  "X"
+
+    Sorting numeric first, then alphanumeric is something I don't wish to implement. I will just manually specify chromosomes to speed up processing.
+
+    #+begin_src R :session yarr :results output
+      tab.only.numeric <- map.nooutliers[map.nooutliers$Chr != "X",]
+      tab.only.X <- map.nooutliers[map.nooutliers$Chr == "X",]
+      ## sort the X by physpos only
+      tab.only.X.sorted <- tab.only.X[order(tab.only.X$MapInfo),]
+
+      ## Convert the chrom to numeric
+      tab.only.numeric$Chr <- as.integer(tab.only.numeric$Chr)
+      tab.only.numeric.sorted <- tab.only.numeric[order(tab.only.numeric$Chr,
+                                                        tab.only.numeric$MapInfo),]
+      ## sort the numeric by chrom then physpos
+      tab.only.numeric.sorted <- tab.only.numeric[order(tab.only.numeric$Chr,
+                                                        tab.only.numeric$MapInfo),]
+
+      ## bind the tables together
+      ordered.map <- rbind(tab.only.numeric.sorted, tab.only.X.sorted)
+
+      head(ordered.map, 3)
+      tail(ordered.map, 3)
+
+      unique(ordered.map$Chr)
+    #+end_src
+
+    #+RESULTS:
+    #+begin_example
+              Chr MapInfo deCODE.cM.
+    rs4475691   1  846808          0
+    rs9777703   1  928836          0
+    rs3128117   1  944564          0
+               Chr   MapInfo deCODE.cM.
+    rs11156600   X 154440161   189.3531
+    rs547447     X 154479421   189.4259
+    rs12557310   X 154735698   189.9009
+     [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11" "12" "13" "14" "15"
+    [16] "16" "17" "18" "19" "20" "21" "22" "X"
+    #+end_example
+
+    and now we format the output
+
+*** Write the output
+
+    We need to convert this now into the usual weird linkage map format: chromosome, marker, cM, physical, marker, "x" (who invented this format?)
+
+    #+begin_quote
+     01      rs28625089      0.83019 830190  rs28625089      x
+    #+end_quote
+
+
+    #+begin_src R :session yarr 
+      cat(sprintf("%s\t%s\t%.6f\t%d\t%s\tx", "Chr", "Name", 0, 0, "Name"),
+          file="~/work/linkage/map/map.all.txt", append=F, fill=T)
+      res <- lapply(1:nrow(ordered.map), function(index){
+        row <- ordered.map[index,]
+        marker <- rownames(row)
+        chrom <- row$Chr
+        chromD <- as.integer(row$Chr)
+        phys <- row$MapInfo
+        centim <- row$deCODE.cM.
+
+        if (is.na(chromD)){  ## is not 1-22
+          fstring <- "%s\t%s\t%.6f\t%d\t%s\tx"
+        } else {
+          fstring <- "%02d\t%s\t%.6f\t%d\t%s\tx"
+          chrom <- chromD
+        }
+
+        cat(sprintf(fstring, chrom, marker, centim, phys, marker),
+            file="~/work/linkage/map/map.all.txt",
+            append = T, fill = T)
+        return(0)
+      })
+      print("done.")  ## otherwise we get a vector of 0000s
+    #+end_src
+
+    #+RESULTS:
+    : done.
+
+    Quick peek
+
+    #+begin_src bash 
+    head ~/work/linkage/map/map.all.txt
+    #+end_src
+
+    #+RESULTS:
+    | Chr | Name       | 0.0 |       0 | Name       | x |
+    |   1 | rs4475691  | 0.0 |  846808 | rs4475691  | x |
+    |   1 | rs9777703  | 0.0 |  928836 | rs9777703  | x |
+    |   1 | rs3128117  | 0.0 |  944564 | rs3128117  | x |
+    |   1 | rs7526076  | 0.0 |  998395 | rs7526076  | x |
+    |   1 | rs9442372  | 0.0 | 1018704 | rs9442372  | x |
+    |   1 | rs6687776  | 0.0 | 1030565 | rs6687776  | x |
+    |   1 | rs6671356  | 0.0 | 1040026 | rs6671356  | x |
+    |   1 | rs12092254 | 0.0 | 1113121 | rs12092254 | x |
+    |   1 | rs3813204  | 0.0 | 1121014 | rs3813204  | x |
+
+** Check that the cM are in order
+
+   We sorted by physical position, and though there is normally an easy correspondence between physical and genetic position -- there might be the odd cM position that is smaller than the one before it.
+
+   An easy way to do this is to take all cM positions and check if it's smaller than the one that proceeds it, except in the case where the chromosome changes (e.g. chr1:99997, chr1:99998, chr2:101). We would expect to see 22 =TRUE= values (1→2, 2→3, 3→4, ..., 22→X).
+
+   #+begin_src R :session yarr 
+     pos.cm <- ordered.map$deCODE.cM.
+
+     pos.cm.compare <- sapply(2:length(pos.cm), function(index){
+       cm1 <- pos.cm[[index - 1]]
+       cm2 <- pos.cm[[index]]
+
+       return(cm1 > cm2)  ## should be FALSE except when chrom changes
+     })
+     sum(pos.cm.compare)
+   #+end_src
+
+   #+RESULTS:
+   : 22
+
+   Yay! Okay, we have a map we can use for linkage.
+
+
+** Remove the outlier markers from the genotypes and maf file
+
+   We only discovered the outlier markers during the map generation phase (note to self: generate the map first before the genotypes). So we need to remove these outlier markers from the genotypes and maf file.
+
+   First let's write out the outlier markers to file:
+
+   #+begin_src R :session yarr
+     write.table(markers.outliers, file="~/work/linkage/map/map.outliers", quote=F, 
+                 col.names=F, row.names=F)
+   #+end_src
+
+   #+RESULTS:
+
+   Now let's remove any lines that match outliers. Let's do this in elisp because it's quicker (edit: that turned out to be a lie...)
+
+   #+begin_src elisp
+
+     (let ((outliers nil))
+       (labels ((getline () (buffer-substring-no-properties
+                             (point)
+                             (progn (forward-line 1) (point))))
+                (process (oldfile newfile)
+                         (let ((newbuff (get-buffer-create "tmp.buff"))
+                               (counter 0))
+                           (with-current-buffer newbuff (erase-buffer))
+                           (with-current-buffer (find-file-noselect oldfile)
+                             (goto-char 0)
+                             (while (not (eobp))
+                               (let* ((line (getline))
+                                      (mark (car (split-string line "[	 ]" nil "[ \n]"))))
+                                 (if (not (member mark outliers))
+                                     (with-current-buffer newbuff (insert line))
+                                   (setq counter (1+ counter)))))
+                             (message "Skipped %d markers" counter))
+                           (with-current-buffer newbuff
+                             (write-file newfile nil)))))
+         ;; populate markers
+         (with-current-buffer (find-file-noselect "~/work/linkage/map/map.outliers")
+           (goto-char 0)
+           (while (not (eobp))
+             (push (string-trim (getline)) outliers))
+           (kill-buffer))
+         ;; parse genotypes
+         (process "~/work/linkage/preprocessed/genotypes" "~/work/linkage/preprocessed/genotypes.new")
+         ;; parse maf
+         (process "~/work/linkage/preprocessed/maf.txt" "~/work/linkage/preprocessed/maf.txt.new")))
+   #+end_src
+
+   And now a quick and final check to see how many lines / markers were removed from the genotypes and the maf:
+
+   #+NAME: linediff
+   #+begin_src bash :var f1="" :results verbatim
+        diff -b $f1 $f1.new | grep "<" | wc -l
+   #+end_src
+
+   Genotypes:
+
+   #+CALL: linediff(f1=(expand-file-name "~/work/linkage/preprocessed/genotypes"))
+
+   #+RESULTS:
+   : 471
+
+   MAF:
+   #+CALL: linediff(f1=(expand-file-name "~/work/linkage/preprocessed/maf.txt"))
+
+   #+RESULTS:
+   : 471
+
+   471 lines different in each file which corresponds to the 471 outliers removed from each file.
+   
+   We can now proceed with the actual linkage analysis (tomorrow) <2020-06-20 Sat>
+
