@@ -1,4 +1,4 @@
-#+TITLE: Inspecting Genotypes
+#+TITLE: Linkage Analysis
 #+PROPERTY: header-args :exports both :eval never-export
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
 #+OPTIONS: H:4 num:nil toc:5
@@ -368,24 +368,24 @@
 ** Canadian
 
   #+begin_src text :padline no :tangle ~/work/linkage/preprocessed/pedfile.pro
-  1181	76211	0	0	1	1
-  1181	2037	0	0	2	1
-  1181	2033	76211	2037	1	1
-  1181	76222	0	0	2	1
-  1181	2036	2033	76222	1	1
-  1181	2035	2033	76222	1	1
-  1181	2034	76211	2037	1	2
-  1181	2032	76211	2037	2	1
-  1181	76213	0	0	1	1
-  1181	2026	76213	2032	1	1
-  1181	2030	76211	2037	2	1
-  1181	76215	0	0	1	1
-  1181	2028	76215	2030	2	1
-  1181	2027	76215	2030	1	1
-  1181	2029	0	0	1	1
-  1181	2031	76211	2037	2	1
-  1181	2024	2029	2031	2	1
-  1181	2025	2029	2031	1	2
+  1183	76211	0	0	1	1
+  1183	2037	0	0	2	1
+  1183	2033	76211	2037	1	1
+  1183	76222	0	0	2	1
+  1183	2036	2033	76222	1	1
+  1183	2035	2033	76222	1	1
+  1183	2034	76211	2037	1	2
+  1183	2032	76211	2037	2	1
+  1183	76213	0	0	1	1
+  1183	2026	76213	2032	1	1
+  1183	2030	76211	2037	2	1
+  1183	76215	0	0	1	1
+  1183	2028	76215	2030	2	1
+  1183	2027	76215	2030	1	1
+  1183	2029	0	0	1	1
+  1183	2031	76211	2037	2	1
+  1183	2024	2029	2031	2	1
+  1183	2025	2029	2031	1	2
   #+end_src
 
 
@@ -406,23 +406,25 @@
 ** British
 
   #+begin_src text :padline no :tangle ~/work/linkage/preprocessed/pedfile.pro
-  1183	7623	0	0	1	1
-  1183	7624	0	0	2	1
-  1183	32	7623	7624	2	1
-  1183	22	7623	7624	2	1
-  1183	20	0	0	1	1
-  1183	44	0	0	1	1
-  1183	79	20	32	1	2
-  1183	61	20	32	1	2
-  1183	35	44	22	2	1
-  1183	57	0	0	1	1
-  1183	97	57	35	1	2
+  1181	7623	0	0	1	1
+  1181	7624	0	0	2	1
+  1181	32	7623	7624	2	1
+  1181	22	7623	7624	2	1
+  1181	20	0	0	1	1
+  1181	44	0	0	1	1
+  1181	79	20	32	1	2
+  1181	61	20	32	1	2
+  1181	35	44	22	2	1
+  1181	57	0	0	1	1
+  1181	97	57	35	1	2
   #+end_src
+
 
 ** Consistency check
 
    Let's export the three tables into the same file and see if there any repeat individuals, and that the parents match. Lisp is good for this.
 
+   #+NAME: pedfileCheck
    #+begin_src elisp :results value 
           (let ((mapped-file nil))
             (with-current-buffer "pedfile.pro"
@@ -1039,10 +1041,12 @@
 
     We need to convert this now into the usual weird linkage map format: chromosome, marker, cM, physical, marker, "x" (who invented this format?)
 
-    #+begin_quote
+    #+begin_src conf
      01      rs28625089      0.83019 830190  rs28625089      x
-    #+end_quote
+    #+end_src
 
+
+    Quick print out
 
     #+begin_src R :session yarr 
       cat(sprintf("%s\t%s\t%.6f\t%d\t%s\tx", "Chr", "Name", 0, 0, "Name"),
@@ -1187,3 +1191,252 @@
    
    We can now proceed with the actual linkage analysis (tomorrow) <2020-06-20 Sat>
 
+
+
+
+* Linkage Analysis
+
+** Snpbutcher
+
+   Here we subselect the map file for informative markers, using snpbutcher. It takes a maf file as input but we will ignore it since it's not necessary to use.
+
+   (here we work on remote machine)
+
+   #+begin_src sh :session linkage :dir /ssh:tetris@132.230.153.85:/home/tetris/work/ :results verbatim
+     cd /home/tetris/work/jobs_for_people/robert/118_canspanbrit/01_initial/
+     snpbutcher2.py map.all.txt maf.txt genotypes -z -nh > map.txt
+   #+end_src
+
+   #+RESULTS:
+   : 
+   : $ /ssh:tetris@132.230.153.85:/home/tetris/work/ #$ [ARGS] Zero maf markers too, NOT using hapmap 
+   : 
+   : [INFO] reading 'genotypes'...
+   : [INFO] found 5952/214093 SNPs uninformative
+   : [INFO] reading 'map.all.txt' and printing new map...
+   : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X 
+   : [INFO] new map contains 38570 SNPs
+
+   We have 38,570 SNPs selected at a cM distance of 0.05.  The =-z= flag is used to essentially skip the maf file, and the =-nh= is used to not check against HapMap.
+
+   
+** Initial Linkage Run
+
+   #+begin_src sh :session linkage
+   linkage_pipeline.sh
+   #+end_src
+
+   #+RESULTS:
+   : [INFO] Checking Display...
+   : Xserver available...? Yes: Remote, all graphical apps will be forwarded to you.
+   : Xclient -> Xserver..? Yes
+   : 
+   : [INFO] Checking Inputs...
+   : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 21, 22, 44, 32, 61, 79, 57, 35, 97]
+   : [Info] The following pedfile IDs are not in the genotypes file and have been specified as ungenotyped [76111, 76211, 76213, 76215, 76222, 7623, 7624, 76112, 76121, 76123]
+   : 
+   : [Warning] The following pedfile IDs were not in the genotypes file: 
+   : 20 
+   : 
+   : [Warning] The following genotypes were not used in the pedfile: 
+   : 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21 
+   : [Info] The following genotypes will be used: 
+   : 22 32 35 44 57 61 79 97 2020 2021 2022 2023 2024 2025 2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037
+
+*** Issues
+
+   Here we have hit some problems:
+
+   1. There is an individual =20= who is specified in the pedigree, but not in the genotypes
+   2. There is an individual =21= who is specified in the genotypes, but not in the pedigree
+   3. We have many individuals =2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060= who are never even used in the pedigree.
+
+      
+   The first two can be resolved by swapping =20= with =21= in the pedigree, but then it begs the question of why this was not done for the paper. In the paper it seems like =21= was changed to =20= in the genotypes files, perhaps because of a sample mixup that was rectified? I need to ask Mallory.
+
+   The third issue means we need to regenerate the genotypes, and then regenerate the map file with =snpbutcher=. Uninformative markers are selected on the basis that an entire marker is =NC= across sampled individuals. By keeping in individuals not relevant to the analysis, we run the (small) risk of keeping markers in the analysis which are =NC= for our wanted individuals but have a genotype call for another individual.
+
+   For example:
+   
+   #+NAME: ExampleGenotypes
+   | Name  | blah | blah | blah | 11 | 12 | 13 | blah |
+   |-------+------+------+------+----+----+----+------|
+   | rs123 | AB   | AB   | NC   | AB | AB | BB | NC   |
+   | rs234 | NC   | NC   | NC   | NC | NC | NC | NC   |
+   | rs345 | AB   | AB   | AB   | NC | NC | NC | AB   |
+   | rs456 | AA   | AA   | AB   | AA | AB | BB | BB   |
+
+   Snpbutcher when run on the whole table will only eliminate marker rs234, but rs345 also remains despite the fact that it is uninformative for the individuals in our pedigree (11, 12, 13)
+
+**** Resolution
+
+     I just spoke with Mallory <2020-06-20 Sat 23:26>, apparently 21 was a troublesome individual who reduced the linkage score, and that 20 was never genotypes -- so I should kick out both individuals 20 and 21 from the pedigree and genotypes
+
+** Fixing the Input Files
+*** Fixing the Pedigree
+
+**** British
+
+    Change individual 20 to 7620
+
+   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+   1181	7623	0	0	1	1
+   1181	7624	0	0	2	1
+   1181	32	7623	7624	2	1
+   1181	22	7623	7624	2	1
+   1181	7620	0	0	1	1
+   1181	44	0	0	1	1
+   1181	79	7620	32	1	2
+   1181	61	7620	32	1	2
+   1181	35	44	22	2	1
+   1181	57	0	0	1	1
+   1181	97	57	35	1	2
+   #+end_src
+
+**** Spanish
+
+   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+   1182	76111	0	0	1	1
+   1182	76112	0	0	2	1
+   1182	76121	0	0	1	1
+   1182	2021	76111	76112	2	1
+   1182	2022	76111	76112	1	2
+   1182	2020	76121	2021	1	2
+   1182	76123	0	0	1	1
+   1182	2023	76123	2021	1	2
+   #+end_src
+
+
+**** Canadian
+
+   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+   1183	76211	0	0	1	1
+   1183	2037	0	0	2	1
+   1183	2033	76211	2037	1	1
+   1183	76222	0	0	2	1
+   1183	2036	2033	76222	1	1
+   1183	2035	2033	76222	1	1
+   1183	2034	76211	2037	1	2
+   1183	2032	76211	2037	2	1
+   1183	76213	0	0	1	1
+   1183	2026	76213	2032	1	1
+   1183	2030	76211	2037	2	1
+   1183	76215	0	0	1	1
+   1183	2028	76215	2030	2	1
+   1183	2027	76215	2030	1	1
+   1183	2029	0	0	1	1
+   1183	2031	76211	2037	2	1
+   1183	2024	2029	2031	2	1
+   1183	2025	2029	2031	1	2
+   #+end_src
+
+**** Consistency Check
+
+    #+CALL:pedfileCheck()
+
+    #+RESULTS:
+    #+begin_example
+    7623	no mother as expected.	no father as expected.
+    7624	no mother as expected.	no father as expected.
+    32	7624 (mother,female) clear	7623 (father,male) clear
+    22	7624 (mother,female) clear	7623 (father,male) clear
+    7620	no mother as expected.	no father as expected.
+    44	no mother as expected.	no father as expected.
+    79	32 (mother,female) clear	7620 (father,male) clear
+    61	32 (mother,female) clear	7620 (father,male) clear
+    35	22 (mother,female) clear	44 (father,male) clear
+    57	no mother as expected.	no father as expected.
+    97	35 (mother,female) clear	57 (father,male) clear
+    76111	no mother as expected.	no father as expected.
+    76112	no mother as expected.	no father as expected.
+    76121	no mother as expected.	no father as expected.
+    2021	76112 (mother,female) clear	76111 (father,male) clear
+    2022	76112 (mother,female) clear	76111 (father,male) clear
+    2020	2021 (mother,female) clear	76121 (father,male) clear
+    76123	no mother as expected.	no father as expected.
+    2023	2021 (mother,female) clear	76123 (father,male) clear
+    76211	no mother as expected.	no father as expected.
+    2037	no mother as expected.	no father as expected.
+    2033	2037 (mother,female) clear	76211 (father,male) clear
+    76222	no mother as expected.	no father as expected.
+    2036	76222 (mother,female) clear	2033 (father,male) clear
+    2035	76222 (mother,female) clear	2033 (father,male) clear
+    2034	2037 (mother,female) clear	76211 (father,male) clear
+    2032	2037 (mother,female) clear	76211 (father,male) clear
+    76213	no mother as expected.	no father as expected.
+    2026	2032 (mother,female) clear	76213 (father,male) clear
+    2030	2037 (mother,female) clear	76211 (father,male) clear
+    76215	no mother as expected.	no father as expected.
+    2028	2030 (mother,female) clear	76215 (father,male) clear
+    2027	2030 (mother,female) clear	76215 (father,male) clear
+    2029	no mother as expected.	no father as expected.
+    2031	2037 (mother,female) clear	76211 (father,male) clear
+    2024	2031 (mother,female) clear	2029 (father,male) clear
+    2025	2031 (mother,female) clear	2029 (father,male) clear
+    #+end_example
+
+    Pass check
+
+
+** Fixing the Genotypes
+
+   Here we will remove =2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21=
+
+   Let us perform a quick check on the headers
+
+   #+begin_src bash
+     head -1 ~/work/linkage/preprocessed/genotypes.new
+   #+end_src
+
+   #+RESULTS:
+   | Name | X2001 | X2002 | X2003 | X2004 | X2005 | X2006 | X2007 | X2008 | X2009 | X2010 | X2011 | X2012 | X2013 | X2014 | X2015 | X2016 | X2017 | X2018 | X2019 | X2020 | X2021 | X2022 | X2023 | X2024 | X2025 | X2026 | X2027 | X2028 | X2029 | X2030 | X2031 | X2032 | X2033 | X2034 | X2035 | X2036 | X2037 | X2038 | X2039 | X2040 | X2041 | X2042 | X2043 | X2044 | X2045 | X2046 | X2047 | X2048 | X2049 | X2050 | X2051 | X2052 | X2053 | X2054 | X2055 | X2056 | X2057 | X2058 | X2059 | X2060 | X21 | X22 | X44 | X32 | X61 | X79 | X57 | X35 | X97 |
+
+
+   (Let's also strip the 'X's from the headers)
+
+   #+begin_src bash
+     sed -i.bak '1 s|X||g' ~/work/linkage/preprocessed/genotypes.new
+     head -1 ~/work/linkage/preprocessed/genotypes.new
+   #+end_src
+
+   #+RESULTS:
+   | Name | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 2038 | 2039 | 2040 | 2041 | 2042 | 2043 | 2044 | 2045 | 2046 | 2047 | 2048 | 2049 | 2050 | 2051 | 2052 | 2053 | 2054 | 2055 | 2056 | 2057 | 2058 | 2059 | 2060 | 21 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+
+   We want to skip columns =1-19=, =38-60=, =61= (+1 to all numbers to the left)
+
+   #+begin_src bash
+     cut --complement -f 2-20,39-61,62 ~/work/linkage/preprocessed/genotypes.new > ~/work/linkage/second/genotypes.new
+     head -2 ~/work/linkage/second/genotypes.new
+   #+end_src
+
+   #+RESULTS:
+   | Name      | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+   | rs1000002 |   BB |   AB |   AA |   BB |   AB |   BB |   AB |   AA |   AB |   BB |   AB |   AB |   AB |   AB |   AB |   AB |   BB |   BB | AB | AB | AB | AB | BB | AB | BB | BB |
+
+
+** Generating New Map file   
+
+   (copied over files in =second= dir to work machine =02_second= folder)
+
+
+   Map and maf file as before.
+
+
+   #+begin_src sh :session linkage :dir /ssh:tetris@132.230.153.85:/home/tetris/work/ :results verbatim
+     cd /home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second
+     snpbutcher2.py map.all.txt maf.txt genotypes -z -nh > map.txt
+   #+end_src
+
+   #+RESULTS:
+   : 
+   : $ [ARGS] Zero maf markers too, NOT using hapmap 
+   : 
+   : [INFO] reading 'genotypes'...
+   : [INFO] found 15607/214093 SNPs uninformative
+   : [INFO] reading 'map.all.txt' and printing new map...
+   : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X 
+   : [INFO] new map contains 37968 SNPs
+
+   37,968 markers, which is less than the 38,570 we had before. Again, this is expected since the markers now have a higher change of being NC across all samples if the number of samples is reduced.
+
+   
