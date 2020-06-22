@@ -1440,3 +1440,145 @@
    37,968 markers, which is less than the 38,570 we had before. Again, this is expected since the markers now have a higher change of being NC across all samples if the number of samples is reduced.
 
    
+* Run 2
+
+  =bitscore.py= computed that the largest family (1183) has 18 bits. I ran out of storage on my work machine so I moved to an external hd.
+
+  Memory peaked on c01 for allegro at 10GB
+
+  It threw an inconsistent genotypes error at rs211641 for family 1181.
+
+  #+NAME: britpedigree
+  | 1181 | 7623 |    0 |    0 | 1 | 1 |
+  | 1181 |   32 | 7623 | 7624 | 2 | 1 |
+  | 1181 |   22 | 7623 | 7624 | 2 | 1 |
+  | 1181 | 7620 |    0 |    0 | 1 | 1 |
+  | 1181 |   44 |    0 |    0 | 1 | 1 |
+  | 1181 |   79 | 7620 |   32 | 1 | 2 |
+  | 1181 |   61 | 7620 |   32 | 1 | 2 |
+  | 1181 |   35 |   44 |   22 | 2 | 1 |
+  | 1181 |   57 |    0 |    0 | 1 | 1 |
+  | 1181 |   97 |   57 |   35 | 1 | 2 |
+  #+end_src
+
+  Let us extract the genotypes for that marker
+
+  #+begin_src bash
+  head -1 /mnt/robert/118_canspanbrit/02_second/genotypes
+  #+end_src
+
+  #+RESULTS:
+  | Name | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+  
+  + 32 - col: 22
+  + 22 - col: 20
+  + 44 - col: 21
+  + 79 - col: 24
+  + 61 - col: 23
+  + 35 - col: 26
+  + 57 - col: 25
+  + 97 - col: 27
+
+    #+begin_src bash
+    cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | head -1
+    cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | grep rs211641
+    #+end_src
+
+    #+RESULTS:
+    | Name     | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+    | rs211641 | AB | AA | AB | BB | AA | BB | AA | AA |
+
+  #+begin_src artist
+               7623[XY] --- 7624[XX]
+                         |
+                _________|_________
+               |                   |
+  7620[XY] --- 32[XX]      44[XY] --- 22[XX]
+            |                      |
+        ____|___                   |
+       |        |      57[XY] --- 35[XX]      
+   *79[XY    *61[XY]           |
+                             *97[XY]  
+  #+end_src
+
+  Here I have made a small drawing of the pedigree for family 1181, with males given as XY and females as XX, with affected individuals given a *.
+
+  Let's fill in the XY/XX with the genotypes
+
+  #+begin_src artist
+               7623[XY] --- 7624[XX]
+                         |
+                _________|_________
+               |                   |
+  7620[XY] --- 32[AB]      44[AA] --- 22[AB]
+            |                      |
+        ____|___                   |
+       |        |      57[BB] --- 35[AA]      
+   *79[AA]    *61[BB]           |
+                             *97[AA]  
+  #+end_src
+
+  So given that the =Y= chromosome can only come from the father, and one of the =X='s from the mother, let us look for any inconsistencies.
+
+  We can actually see two:
+  + 7620 → 79 and 61 :: These are all males, so the offspring should share at least 1 allele, but the GT calls for the offspring are =AA= and =BB= which means they cannot share the same father.
+  + 57 → 97 :: Again, both males and yet not a single allele appears to be shared between them
+
+    
+  From this we can conclude that allegro is correct in saying that this marker is inconsistent. What we can do next is remove this marker and then rerun the entire analysis (~ 2hrs), but there will likely be other markers which are inconsistent and this will be very slow to debug.
+
+  While I rerun this again (without rs211641) I will try to write my own parser to validate these kinds of genotypes
+
+** Rerun without rs211641
+
+   Remove this marker from current map, maf, and genotypes. Currently we have:
+
+   #+begin_src bash 
+   wc -l /mnt/robert/118_canspanbrit/02_second/{genotypes,maf.txt,map.txt}
+   #+end_src
+
+   #+RESULTS:
+   | 214093 | /mnt/robert/118_canspanbrit/02_second/genotypes |
+   | 214093 | /mnt/robert/118_canspanbrit/02_second/maf.txt   |
+   |  37969 | /mnt/robert/118_canspanbrit/02_second/map.txt   |
+
+   and now if we remove one marker, we have:
+
+   #+begin_src bash
+   newdir=/mnt/robert/118_canspanbrit/03_nors211641
+   mkdir -p $newdir 
+   cp /mnt/robert/118_canspanbrit/02_second/pedfile.pro $newdir/pedfile.pro
+   cat /mnt/robert/118_canspanbrit/02_second/genotypes | grep -v rs211641 > $newdir/genotypes
+   cat /mnt/robert/118_canspanbrit/02_second/map.txt | grep -v rs211641 > $newdir/map.txt
+   cat /mnt/robert/118_canspanbrit/02_second/maf.txt | grep -v rs211641 > $newdir/maf.txt
+   wc -l $newdir/{genotypes,maf.txt,map.txt}
+   #+end_src
+
+   #+RESULTS:
+   | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/genotypes |
+   | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/maf.txt   |
+   |  37968 | /mnt/robert/118_canspanbrit/03_nors211641/map.txt   |
+
+   1 line less, good. 
+
+   Okay now we can rerun the whole pipeline again. There is a small issue that wine cannot see a mounted volume so let's link it to a directory in home and run it from there
+
+   #+begin_src bash
+   ln -s /mnt/robert/118_canspanbrit/03_nors211641 /home/tetris/work/jobs_for_people/robert/118_canspanbrit/03_nors211641
+   #+end_src
+
+   #+RESULTS:
+
+*** GRR notes
+
+    Some things to note, in family 1183 - individual 2030 and 2034 are labelled as sister-brother, but the IBS relationship diagram seems to suggest that they might actually be mother-son! 
+
+    Similarly, in family 1181 -- individual 57 and 97 are said to be father-son, but the IBS relationship diagram seems to suggest they might actually be brother-brother. This is a strange observation, since 57 comes from outside of the family, and yet there is a stronger familial tie between father-son than the mother-son. 
+
+    Possible explanations are that 35 is not actually the mother, in which 97's mutation comes from outside of the family. 
+
+
+
+
+
+
