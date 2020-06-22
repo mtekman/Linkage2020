@@ -41,14 +41,14 @@
     cut -f1 Spanish/genotypes | sort | uniq -D
     #+end_src
 
-    No duplicates. 
+    No duplicates.
 
 *** Overlapping markers between the sets?
- 
+
     #+begin_src bash :session yes :results table
       cut -f1 Canadian/genotypes Spanish/genotypes\
           | sort | uniq -c | grep ' 2 '\
-          | awk '{print $2}'  | grep -v "Name" > overlap.markers.canadaspain 
+          | awk '{print $2}'  | grep -v "Name" > overlap.markers.canadaspain
       wc -l overlap.markers.canadaspain
     #+end_src
 
@@ -116,19 +116,19 @@
 
   #+RESULTS:
   #+begin_example
-  X2001 X2002 X2003 X2004 X2005 X2006 X2007 X2008 X2009 X2010 X2011 X2012 X2013 
-   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE 
-  X2014 X2015 X2016 X2017 X2018 X2019 X2020 X2021 X2022 X2023 X2024 X2025 X2026 
-   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE 
-  X2027 X2028 X2029 X2030 X2031 X2032 X2033 X2034 X2035 X2036 X2037 X2038 X2039 
-   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE 
-  X2040 X2041 X2042 X2043 X2044 X2045 X2046 X2047 X2048 X2049 X2050 X2051 X2052 
-   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE 
-  X2053 X2054 X2055 X2056 X2057 X2058 X2059 X2060 
+  X2001 X2002 X2003 X2004 X2005 X2006 X2007 X2008 X2009 X2010 X2011 X2012 X2013
+   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+  X2014 X2015 X2016 X2017 X2018 X2019 X2020 X2021 X2022 X2023 X2024 X2025 X2026
+   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+  X2027 X2028 X2029 X2030 X2031 X2032 X2033 X2034 X2035 X2036 X2037 X2038 X2039
+   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+  X2040 X2041 X2042 X2043 X2044 X2045 X2046 X2047 X2048 X2049 X2050 X2051 X2052
+   TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+  X2053 X2054 X2055 X2056 X2057 X2058 X2059 X2060
    TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
   #+end_example
 
-  So for our intersected Canadian and Spanish datasets, all individuals exist in both datasets and the genotypes are the same.... 
+  So for our intersected Canadian and Spanish datasets, all individuals exist in both datasets and the genotypes are the same....
 
   Okay, so let's look at the differences.
 
@@ -138,7 +138,7 @@
   #+begin_src R :session ones :results output
   names.spanish <- rownames(tab.spanish) # small
   names.canada <- rownames(tab.canada)   # large
-  
+
   names.spanish.diff <- names.spanish[!(names.spanish %in% tab.overlap.markers)]
   names.canada.diff <- names.canada[!(names.canada %in% tab.overlap.markers)]
 
@@ -171,7 +171,7 @@
    I spoke with Mallory <2020-06-16 Tue>, and she said that the overlap was indeed strange but that's how the files were given to her. I very well may have been the last person to touch this project, so it could have been something I may have done previously, a previous merging of these datasets...
 
    On the other hand, it could be that these families were genotyped together _twice_, in which case the fact that the genotypes for the overlapping markers have perfect matches, this adds a large amount of credibility to these genotypes (although the NC calls being consistent would be strange, unless the DNA in those regions were genuinely hard to genotype).
-  
+
 
 * Merging the genotypes file
 
@@ -219,7 +219,7 @@
   inters[[4]] <- intersect.do(markers.canadian, markers.spanish, markers.british)
   inters[[5]] <- intersect.do(markers.spanish, markers.british, markers.canadian)
   inters[[6]] <- intersect.do(markers.spanish, markers.canadian, markers.british)
-  
+
   # All the same length?
   sapply(inters, length)
 
@@ -229,7 +229,7 @@
   all(inters[[5]] == inters[[6]])
   all(inters[[1]] == inters[[4]])
   all(inters[[1]] == inters[[6]])
-  
+
   #+end_src
 
   #+RESULTS:
@@ -257,24 +257,24 @@
   #+RESULTS:
   #+begin_example
   [1] 214563    129
-    [1] "X2001"   "X2001.1" "X2002"   "X2002.1" "X2003"   "X2003.1" "X2004"  
+    [1] "X2001"   "X2001.1" "X2002"   "X2002.1" "X2003"   "X2003.1" "X2004"
     [8] "X2004.1" "X2005"   "X2005.1" "X2006"   "X2006.1" "X2007"   "X2007.1"
-   [15] "X2008"   "X2008.1" "X2009"   "X2009.1" "X2010"   "X2010.1" "X2011"  
+   [15] "X2008"   "X2008.1" "X2009"   "X2009.1" "X2010"   "X2010.1" "X2011"
    [22] "X2011.1" "X2012"   "X2012.1" "X2013"   "X2013.1" "X2014"   "X2014.1"
-   [29] "X2015"   "X2015.1" "X2016"   "X2016.1" "X2017"   "X2017.1" "X2018"  
+   [29] "X2015"   "X2015.1" "X2016"   "X2016.1" "X2017"   "X2017.1" "X2018"
    [36] "X2018.1" "X2019"   "X2019.1" "X2020"   "X2020.1" "X2021"   "X2021.1"
-   [43] "X2022"   "X2022.1" "X2023"   "X2023.1" "X2024"   "X2024.1" "X2025"  
+   [43] "X2022"   "X2022.1" "X2023"   "X2023.1" "X2024"   "X2024.1" "X2025"
    [50] "X2025.1" "X2026"   "X2026.1" "X2027"   "X2027.1" "X2028"   "X2028.1"
-   [57] "X2029"   "X2029.1" "X2030"   "X2030.1" "X2031"   "X2031.1" "X2032"  
+   [57] "X2029"   "X2029.1" "X2030"   "X2030.1" "X2031"   "X2031.1" "X2032"
    [64] "X2032.1" "X2033"   "X2033.1" "X2034"   "X2034.1" "X2035"   "X2035.1"
-   [71] "X2036"   "X2036.1" "X2037"   "X2037.1" "X2038"   "X2038.1" "X2039"  
+   [71] "X2036"   "X2036.1" "X2037"   "X2037.1" "X2038"   "X2038.1" "X2039"
    [78] "X2039.1" "X2040"   "X2040.1" "X2041"   "X2041.1" "X2042"   "X2042.1"
-   [85] "X2043"   "X2043.1" "X2044"   "X2044.1" "X2045"   "X2045.1" "X2046"  
+   [85] "X2043"   "X2043.1" "X2044"   "X2044.1" "X2045"   "X2045.1" "X2046"
    [92] "X2046.1" "X2047"   "X2047.1" "X2048"   "X2048.1" "X2049"   "X2049.1"
-   [99] "X2050"   "X2050.1" "X2051"   "X2051.1" "X2052"   "X2052.1" "X2053"  
+   [99] "X2050"   "X2050.1" "X2051"   "X2051.1" "X2052"   "X2052.1" "X2053"
   [106] "X2053.1" "X2054"   "X2054.1" "X2055"   "X2055.1" "X2056"   "X2056.1"
-  [113] "X2057"   "X2057.1" "X2058"   "X2058.1" "X2059"   "X2059.1" "X2060"  
-  [120] "X2060.1" "X21"     "X22"     "X32"     "X35"     "X44"     "X57"    
+  [113] "X2057"   "X2057.1" "X2058"   "X2058.1" "X2059"   "X2059.1" "X2060"
+  [120] "X2060.1" "X21"     "X22"     "X32"     "X35"     "X44"     "X57"
   [127] "X61"     "X79"     "X97"
   #+end_example
 
@@ -284,34 +284,34 @@
   names.merged <- colnames(mat.merged)
   names.dupes.bool <- sapply(names.merged, function(x){endsWith(x,".1")})
   names.dupes <- names.merged[names.dupes.bool]
- 
+
   sapply(names.dupes, function(dupers){
       namers <- strsplit(dupers, split="\\.1")[[1]]
-      ## 
+      ##
       vec.dupes <- mat.merged[,dupers]
       vec.names <- mat.merged[,namers]
-      ## 
+      ##
       return(all(vec.dupes == vec.names))
   })
   #+end_src
 
   #+RESULTS:
   #+begin_example
-  X2001.1 X2002.1 X2003.1 X2004.1 X2005.1 X2006.1 X2007.1 X2008.1 X2009.1 X2010.1 
-     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-  X2011.1 X2012.1 X2013.1 X2014.1 X2015.1 X2016.1 X2017.1 X2018.1 X2019.1 X2020.1 
-     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-  X2021.1 X2022.1 X2023.1 X2024.1 X2025.1 X2026.1 X2027.1 X2028.1 X2029.1 X2030.1 
-     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-  X2031.1 X2032.1 X2033.1 X2034.1 X2035.1 X2036.1 X2037.1 X2038.1 X2039.1 X2040.1 
-     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-  X2041.1 X2042.1 X2043.1 X2044.1 X2045.1 X2046.1 X2047.1 X2048.1 X2049.1 X2050.1 
-     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-  X2051.1 X2052.1 X2053.1 X2054.1 X2055.1 X2056.1 X2057.1 X2058.1 X2059.1 X2060.1 
+  X2001.1 X2002.1 X2003.1 X2004.1 X2005.1 X2006.1 X2007.1 X2008.1 X2009.1 X2010.1
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  X2011.1 X2012.1 X2013.1 X2014.1 X2015.1 X2016.1 X2017.1 X2018.1 X2019.1 X2020.1
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  X2021.1 X2022.1 X2023.1 X2024.1 X2025.1 X2026.1 X2027.1 X2028.1 X2029.1 X2030.1
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  X2031.1 X2032.1 X2033.1 X2034.1 X2035.1 X2036.1 X2037.1 X2038.1 X2039.1 X2040.1
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  X2041.1 X2042.1 X2043.1 X2044.1 X2045.1 X2046.1 X2047.1 X2048.1 X2049.1 X2050.1
+     TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
+  X2051.1 X2052.1 X2053.1 X2054.1 X2055.1 X2056.1 X2057.1 X2058.1 X2059.1 X2060.1
      TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE
   #+end_example
-  
-  
+
+
   Yep, identical genotypes for all duplicate individuals -- let's remove them.
 
   #+begin_src R :session ones :results output
@@ -328,9 +328,9 @@
   : [28] "X2028" "X2029" "X2030" "X2031" "X2032" "X2033" "X2034" "X2035" "X2036"
   : [37] "X2037" "X2038" "X2039" "X2040" "X2041" "X2042" "X2043" "X2044" "X2045"
   : [46] "X2046" "X2047" "X2048" "X2049" "X2050" "X2051" "X2052" "X2053" "X2054"
-  : [55] "X2055" "X2056" "X2057" "X2058" "X2059" "X2060" "X21"   "X22"   "X44"  
+  : [55] "X2055" "X2056" "X2057" "X2058" "X2059" "X2060" "X21"   "X22"   "X44"
   : [64] "X32"   "X61"   "X79"   "X57"   "X35"   "X97"
-  
+
   Okay, we have a fully merged matrix. Let's write it out
 
   #+begin_src bash
@@ -339,15 +339,15 @@
 
   #+RESULTS:
 
-  #+begin_src R :session ones 
+  #+begin_src R :session ones
   # Write genotypes
-  write.table(mat.merged.nodupes, file="~/work/linkage/preprocessed/genotypes", 
+  write.table(mat.merged.nodupes, file="~/work/linkage/preprocessed/genotypes",
               quote=F, sep="\t", col.names = NA)
   #+end_src
 
   #+RESULTS:
 
-** Write MAF  
+** Write MAF
 
    The minor allele frequency file should also be written from the set of markers we have. We will assume all markers have a MAF of 0.5
 
@@ -360,7 +360,7 @@
    #+RESULTS:
 
 
-* Pedigree 
+* Pedigree
 
   I will rely on the pedfiles given to me, since I have no way of verifying the pedigrees myself. The family names will be prefixed with '118' and suffixed with '1' '2' or '3' depending for Canadian, Spanish, and British.
 
@@ -425,7 +425,7 @@
    Let's export the three tables into the same file and see if there any repeat individuals, and that the parents match. Lisp is good for this.
 
    #+NAME: pedfileCheck
-   #+begin_src elisp :results value 
+   #+begin_src elisp :results value
           (let ((mapped-file nil))
             (with-current-buffer "pedfile.pro"
               (goto-char (point-min))
@@ -529,7 +529,7 @@
    97	35 (mother,female) clear	57 (father,male) clear
    #+end_example
 
-   
+
    Okay, pedigree appears to have no duplicates, and all parents appear to exist and have the right genders.
 
 
@@ -545,7 +545,7 @@
 
 ** Infinium Multi Ethnic Global Beadchip
 
-   The [[https://www.illumina.com/search.html?q=Infinium%20Multi%20Ethnic%20Global&filter=all&p=1][closest match]] only offers a PDF for the Beadchip, but no specific map files. I would guess that "Infinium Multi Ethnic Global Beadchip" is part of the "Infinium Multi Ethnic Global" Kit, so that is what [[https://support.illumina.com/downloads/infinium-multi-ethnic-global-8-v1-support-files.html][I went with]]. The file chosen was "Infinium Multi-Ethnic Global-8 v1.0 Physical and Genetic Coordinates" but two builds were offered: hg19 and hg38. 
+   The [[https://www.illumina.com/search.html?q=Infinium%20Multi%20Ethnic%20Global&filter=all&p=1][closest match]] only offers a PDF for the Beadchip, but no specific map files. I would guess that "Infinium Multi Ethnic Global Beadchip" is part of the "Infinium Multi Ethnic Global" Kit, so that is what [[https://support.illumina.com/downloads/infinium-multi-ethnic-global-8-v1-support-files.html][I went with]]. The file chosen was "Infinium Multi-Ethnic Global-8 v1.0 Physical and Genetic Coordinates" but two builds were offered: hg19 and hg38.
 
    The linkage plotting tools only have chromosome map for hg18 and hg19, so I opted to download the hg19 for compatibility.
 
@@ -605,7 +605,7 @@
 
    So I am reasonably confident this map file is hg19/hg37
 
-  
+
 ** Omni-X-24 BeadChip
 
    The [[https://support.illumina.com/downloads/infinium-omniexpress-24-v1-3-support-files.html][closest match]] was the OmniExpress-24, and the file chosen was the "Infinium OmniExpress-24 v1.3 Physical and Genetic Coordinates" but no genome was given.
@@ -618,7 +618,7 @@
    #+end_src
 
    #+RESULTS:
-   | InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt | multi-ethnic-global-8-d1-physical-genetic-coordinates.zip      | 
+   | InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt | multi-ethnic-global-8-d1-physical-genetic-coordinates.zip      |
    | infinium-omniexpress-24-v1-3-a1-physical-genetic-coordinates.zip       | Multi-EthnicGlobal_D1.csv_Physical-and-Genetic-Coordinates.txt |
 
    #+CALL: peek(name="InfiniumOmniExpress-24v1-3_A1.csv_Physical-and-Genetic-Coordinates.txt")
@@ -654,14 +654,14 @@
        - Position: chr4:111026927-111026927 (matches table)
        - [[https://genome.ucsc.edu/cgi-bin/hgc?hgsid=847952011_zNJAYkkl1WqOaR7eAd9E6HJWah8q&c=chr4&l=111026876&r=111026977&o=111026926&t=111026927&g=dbSnp153Common&i=rs10011926][Link]]
 
-         
+
    So I am reasonably confident this map file is hg19.
 
-** Combining Maps   
+** Combining Maps
 
    We currently have two hg19 marker maps and we want to merge them on common marker names and positions. R is better suited for this:
 
-   #+begin_src R :session yarr 
+   #+begin_src R :session yarr
      tableau <- function(name, ...) {
        read.table(name, stringsAsFactors=F, row.names=1, ...)
      }
@@ -673,7 +673,7 @@
    #+end_src
 
    #+RESULTS:
-   
+
    Peek at each file:
 
    #+begin_src R :session yarr :results output
@@ -791,7 +791,7 @@
    rs10000272   4 189690383   204.0179
    #+end_example
 
-   Sorting by marker name gives the same top 10 markers in each file with identical physical and genetic positions. Let's check all markers.  
+   Sorting by marker name gives the same top 10 markers in each file with identical physical and genetic positions. Let's check all markers.
 
     #+begin_src R :session yarr :results output
       all(sort(rownames(map.intersect1)) == sort(rownames(map.intersect2)))
@@ -816,9 +816,9 @@
      mcsapply <- function (X, FUN, ..., simplify = TRUE, USE.NAMES = TRUE) {
        FUN <- match.fun(FUN)
        answer <- parallel::mclapply(X = X, FUN = FUN, ...)
-       if (USE.NAMES && is.character(X) && is.null(names(answer))) 
+       if (USE.NAMES && is.character(X) && is.null(names(answer)))
          names(answer) <- X
-       if (!isFALSE(simplify) && length(answer)) 
+       if (!isFALSE(simplify) && length(answer))
          simplify2array(answer, higher = (simplify == "array"))
        else answer
      }
@@ -847,14 +847,14 @@
    #+end_src
 
    #+RESULTS:
-   :    Mode   FALSE    TRUE    NA's 
+   :    Mode   FALSE    TRUE    NA's
    : logical       1  116170     470
 
    So it looks like 116170 markers were in complete agreement with one another. 470 were not sure (or could not do the comparison) and 1 was flat out wrong.
 
    Let us look at these outliers and see whether the issue was to do with precision (e.g. 15.1416 vs 15.14159) or something more concerning.
 
-*** Examining Outliers   
+*** Examining Outliers
 
 **** False Markers
 
@@ -912,7 +912,7 @@
      | rs10436791 | omnix      | Y | 14518606 | NA |
      | rs10436791 | global     | Y | 14518606 | NA |
 
-     #+CALL: compare1(name="rs1050190")     
+     #+CALL: compare1(name="rs1050190")
 
      #+RESULTS:
      | rs1050190 | intersect1 | 0 | 0 | NA |
@@ -920,9 +920,9 @@
      | rs1050190 | omnix      | 0 | 0 | NA |
      | rs1050190 | global     | 0 | 0 | NA |
 
-     Just from comparing the top and bottom marker in that list of 10 we can see that the cM information is NA. 
+     Just from comparing the top and bottom marker in that list of 10 we can see that the cM information is NA.
 
-     This makes sense because for the top marker it is on the Y chromosome for which there is 0 recombination probability (or at least a not yet well-understood probability of a recombination event). 
+     This makes sense because for the top marker it is on the Y chromosome for which there is 0 recombination probability (or at least a not yet well-understood probability of a recombination event).
 
      For the bottom marker, these have a chromosome of 0..., which I have no idea what that means, but that is also how they are written in the original map files.
 
@@ -930,7 +930,7 @@
 
      Let's summarize the chromosomes of these outliers and see if they are on weird chromosomes. If they are then we can just drop them.
 
-     #+begin_src R :session yarr 
+     #+begin_src R :session yarr
        markers.outliers <- names(res)[is.na(res) | res==FALSE]
        source.outliers <- rbind(map.global[markers.outliers,],
                                 map.omnix[markers.outliers,])
@@ -970,7 +970,7 @@
      #+RESULTS:
      | 116170 |
      |      3 |
-     
+
      and a quick check for NA values:
 
      #+begin_src R :session yarr
@@ -981,7 +981,7 @@
      | FALSE | 348510 |
 
 
-     Good, this is a clean table. 
+     Good, this is a clean table.
 
 *** Sort the map
 
@@ -1048,7 +1048,7 @@
 
     Quick print out
 
-    #+begin_src R :session yarr 
+    #+begin_src R :session yarr
       cat(sprintf("%s\t%s\t%.6f\t%d\t%s\tx", "Chr", "Name", 0, 0, "Name"),
           file="~/work/linkage/map/map.all.txt", append=F, fill=T)
       res <- lapply(1:nrow(ordered.map), function(index){
@@ -1079,7 +1079,7 @@
 
     Quick peek
 
-    #+begin_src bash 
+    #+begin_src bash
     head ~/work/linkage/map/map.all.txt
     #+end_src
 
@@ -1101,7 +1101,7 @@
 
    An easy way to do this is to take all cM positions and check if it's smaller than the one that proceeds it, except in the case where the chromosome changes (e.g. chr1:99997, chr1:99998, chr2:101). We would expect to see 22 =TRUE= values (1→2, 2→3, 3→4, ..., 22→X).
 
-   #+begin_src R :session yarr 
+   #+begin_src R :session yarr
      pos.cm <- ordered.map$deCODE.cM.
 
      pos.cm.compare <- sapply(2:length(pos.cm), function(index){
@@ -1126,7 +1126,7 @@
    First let's write out the outlier markers to file:
 
    #+begin_src R :session yarr
-     write.table(markers.outliers, file="~/work/linkage/map/map.outliers", quote=F, 
+     write.table(markers.outliers, file="~/work/linkage/map/map.outliers", quote=F,
                  col.names=F, row.names=F)
    #+end_src
 
@@ -1188,7 +1188,7 @@
    : 471
 
    471 lines different in each file which corresponds to the 471 outliers removed from each file.
-   
+
    We can now proceed with the actual linkage analysis (tomorrow) <2020-06-20 Sat>
 
 
@@ -1208,18 +1208,18 @@
    #+end_src
 
    #+RESULTS:
-   : 
-   : $ /ssh:tetris@132.230.153.85:/home/tetris/work/ #$ [ARGS] Zero maf markers too, NOT using hapmap 
-   : 
+   :
+   : $ /ssh:tetris@132.230.153.85:/home/tetris/work/ #$ [ARGS] Zero maf markers too, NOT using hapmap
+   :
    : [INFO] reading 'genotypes'...
    : [INFO] found 5952/214093 SNPs uninformative
    : [INFO] reading 'map.all.txt' and printing new map...
-   : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X 
+   : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X
    : [INFO] new map contains 38570 SNPs
 
    We have 38,570 SNPs selected at a cM distance of 0.05.  The =-z= flag is used to essentially skip the maf file, and the =-nh= is used to not check against HapMap.
 
-   
+
 ** Initial Linkage Run
 
    #+begin_src sh :session linkage
@@ -1230,17 +1230,17 @@
    : [INFO] Checking Display...
    : Xserver available...? Yes: Remote, all graphical apps will be forwarded to you.
    : Xclient -> Xserver..? Yes
-   : 
+   :
    : [INFO] Checking Inputs...
    : [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 21, 22, 44, 32, 61, 79, 57, 35, 97]
    : [Info] The following pedfile IDs are not in the genotypes file and have been specified as ungenotyped [76111, 76211, 76213, 76215, 76222, 7623, 7624, 76112, 76121, 76123]
-   : 
-   : [Warning] The following pedfile IDs were not in the genotypes file: 
-   : 20 
-   : 
-   : [Warning] The following genotypes were not used in the pedfile: 
-   : 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21 
-   : [Info] The following genotypes will be used: 
+   :
+   : [Warning] The following pedfile IDs were not in the genotypes file:
+   : 20
+   :
+   : [Warning] The following genotypes were not used in the pedfile:
+   : 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21
+   : [Info] The following genotypes will be used:
    : 22 32 35 44 57 61 79 97 2020 2021 2022 2023 2024 2025 2026 2027 2028 2029 2030 2031 2032 2033 2034 2035 2036 2037
 
 *** Issues
@@ -1251,13 +1251,13 @@
    2. There is an individual =21= who is specified in the genotypes, but not in the pedigree
    3. We have many individuals =2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060= who are never even used in the pedigree.
 
-      
+
    The first two can be resolved by swapping =20= with =21= in the pedigree, but then it begs the question of why this was not done for the paper. In the paper it seems like =21= was changed to =20= in the genotypes files, perhaps because of a sample mixup that was rectified? I need to ask Mallory.
 
    The third issue means we need to regenerate the genotypes, and then regenerate the map file with =snpbutcher=. Uninformative markers are selected on the basis that an entire marker is =NC= across sampled individuals. By keeping in individuals not relevant to the analysis, we run the (small) risk of keeping markers in the analysis which are =NC= for our wanted individuals but have a genotype call for another individual.
 
    For example:
-   
+
    #+NAME: ExampleGenotypes
    | Name  | blah | blah | blah | 11 | 12 | 13 | blah |
    |-------+------+------+------+----+----+----+------|
@@ -1272,313 +1272,432 @@
 
      I just spoke with Mallory <2020-06-20 Sat 23:26>, apparently 21 was a troublesome individual who reduced the linkage score, and that 20 was never genotypes -- so I should kick out both individuals 20 and 21 from the pedigree and genotypes
 
-** Fixing the Input Files
-*** Fixing the Pedigree
+*** Fixing the Input Files
+**** Fixing the Pedigree
 
-**** British
+***** British
 
-    Change individual 20 to 7620
+     Change individual 20 to 7620
 
-   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
-   1181	7623	0	0	1	1
-   1181	7624	0	0	2	1
-   1181	32	7623	7624	2	1
-   1181	22	7623	7624	2	1
-   1181	7620	0	0	1	1
-   1181	44	0	0	1	1
-   1181	79	7620	32	1	2
-   1181	61	7620	32	1	2
-   1181	35	44	22	2	1
-   1181	57	0	0	1	1
-   1181	97	57	35	1	2
-   #+end_src
+    #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+    1181	7623	0	0	1	1
+    1181	7624	0	0	2	1
+    1181	32	7623	7624	2	1
+    1181	22	7623	7624	2	1
+    1181	7620	0	0	1	1
+    1181	44	0	0	1	1
+    1181	79	7620	32	1	2
+    1181	61	7620	32	1	2
+    1181	35	44	22	2	1
+    1181	57	0	0	1	1
+    1181	97	57	35	1	2
+    #+end_src
 
-**** Spanish
+***** Spanish
 
-   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
-   1182	76111	0	0	1	1
-   1182	76112	0	0	2	1
-   1182	76121	0	0	1	1
-   1182	2021	76111	76112	2	1
-   1182	2022	76111	76112	1	2
-   1182	2020	76121	2021	1	2
-   1182	76123	0	0	1	1
-   1182	2023	76123	2021	1	2
-   #+end_src
-
-
-**** Canadian
-
-   #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
-   1183	76211	0	0	1	1
-   1183	2037	0	0	2	1
-   1183	2033	76211	2037	1	1
-   1183	76222	0	0	2	1
-   1183	2036	2033	76222	1	1
-   1183	2035	2033	76222	1	1
-   1183	2034	76211	2037	1	2
-   1183	2032	76211	2037	2	1
-   1183	76213	0	0	1	1
-   1183	2026	76213	2032	1	1
-   1183	2030	76211	2037	2	1
-   1183	76215	0	0	1	1
-   1183	2028	76215	2030	2	1
-   1183	2027	76215	2030	1	1
-   1183	2029	0	0	1	1
-   1183	2031	76211	2037	2	1
-   1183	2024	2029	2031	2	1
-   1183	2025	2029	2031	1	2
-   #+end_src
-
-**** Consistency Check
-
-    #+CALL:pedfileCheck()
-
-    #+RESULTS:
-    #+begin_example
-    7623	no mother as expected.	no father as expected.
-    7624	no mother as expected.	no father as expected.
-    32	7624 (mother,female) clear	7623 (father,male) clear
-    22	7624 (mother,female) clear	7623 (father,male) clear
-    7620	no mother as expected.	no father as expected.
-    44	no mother as expected.	no father as expected.
-    79	32 (mother,female) clear	7620 (father,male) clear
-    61	32 (mother,female) clear	7620 (father,male) clear
-    35	22 (mother,female) clear	44 (father,male) clear
-    57	no mother as expected.	no father as expected.
-    97	35 (mother,female) clear	57 (father,male) clear
-    76111	no mother as expected.	no father as expected.
-    76112	no mother as expected.	no father as expected.
-    76121	no mother as expected.	no father as expected.
-    2021	76112 (mother,female) clear	76111 (father,male) clear
-    2022	76112 (mother,female) clear	76111 (father,male) clear
-    2020	2021 (mother,female) clear	76121 (father,male) clear
-    76123	no mother as expected.	no father as expected.
-    2023	2021 (mother,female) clear	76123 (father,male) clear
-    76211	no mother as expected.	no father as expected.
-    2037	no mother as expected.	no father as expected.
-    2033	2037 (mother,female) clear	76211 (father,male) clear
-    76222	no mother as expected.	no father as expected.
-    2036	76222 (mother,female) clear	2033 (father,male) clear
-    2035	76222 (mother,female) clear	2033 (father,male) clear
-    2034	2037 (mother,female) clear	76211 (father,male) clear
-    2032	2037 (mother,female) clear	76211 (father,male) clear
-    76213	no mother as expected.	no father as expected.
-    2026	2032 (mother,female) clear	76213 (father,male) clear
-    2030	2037 (mother,female) clear	76211 (father,male) clear
-    76215	no mother as expected.	no father as expected.
-    2028	2030 (mother,female) clear	76215 (father,male) clear
-    2027	2030 (mother,female) clear	76215 (father,male) clear
-    2029	no mother as expected.	no father as expected.
-    2031	2037 (mother,female) clear	76211 (father,male) clear
-    2024	2031 (mother,female) clear	2029 (father,male) clear
-    2025	2031 (mother,female) clear	2029 (father,male) clear
-    #+end_example
-
-    Pass check
+    #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+    1182	76111	0	0	1	1
+    1182	76112	0	0	2	1
+    1182	76121	0	0	1	1
+    1182	2021	76111	76112	2	1
+    1182	2022	76111	76112	1	2
+    1182	2020	76121	2021	1	2
+    1182	76123	0	0	1	1
+    1182	2023	76123	2021	1	2
+    #+end_src
 
 
-** Fixing the Genotypes
+***** Canadian
 
-   Here we will remove =2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21=
+    #+begin_src text :padline no :tangle ~/work/linkage/second/pedfile.pro
+    1183	76211	0	0	1	1
+    1183	2037	0	0	2	1
+    1183	2033	76211	2037	1	1
+    1183	76222	0	0	2	1
+    1183	2036	2033	76222	1	1
+    1183	2035	2033	76222	1	1
+    1183	2034	76211	2037	1	2
+    1183	2032	76211	2037	2	1
+    1183	76213	0	0	1	1
+    1183	2026	76213	2032	1	1
+    1183	2030	76211	2037	2	1
+    1183	76215	0	0	1	1
+    1183	2028	76215	2030	2	1
+    1183	2027	76215	2030	1	1
+    1183	2029	0	0	1	1
+    1183	2031	76211	2037	2	1
+    1183	2024	2029	2031	2	1
+    1183	2025	2029	2031	1	2
+    #+end_src
 
-   Let us perform a quick check on the headers
+***** Consistency Check
 
-   #+begin_src bash
-     head -1 ~/work/linkage/preprocessed/genotypes.new
-   #+end_src
+     #+CALL:pedfileCheck()
 
-   #+RESULTS:
-   | Name | X2001 | X2002 | X2003 | X2004 | X2005 | X2006 | X2007 | X2008 | X2009 | X2010 | X2011 | X2012 | X2013 | X2014 | X2015 | X2016 | X2017 | X2018 | X2019 | X2020 | X2021 | X2022 | X2023 | X2024 | X2025 | X2026 | X2027 | X2028 | X2029 | X2030 | X2031 | X2032 | X2033 | X2034 | X2035 | X2036 | X2037 | X2038 | X2039 | X2040 | X2041 | X2042 | X2043 | X2044 | X2045 | X2046 | X2047 | X2048 | X2049 | X2050 | X2051 | X2052 | X2053 | X2054 | X2055 | X2056 | X2057 | X2058 | X2059 | X2060 | X21 | X22 | X44 | X32 | X61 | X79 | X57 | X35 | X97 |
+     #+RESULTS:
+     #+begin_example
+     7623	no mother as expected.	no father as expected.
+     7624	no mother as expected.	no father as expected.
+     32	7624 (mother,female) clear	7623 (father,male) clear
+     22	7624 (mother,female) clear	7623 (father,male) clear
+     7620	no mother as expected.	no father as expected.
+     44	no mother as expected.	no father as expected.
+     79	32 (mother,female) clear	7620 (father,male) clear
+     61	32 (mother,female) clear	7620 (father,male) clear
+     35	22 (mother,female) clear	44 (father,male) clear
+     57	no mother as expected.	no father as expected.
+     97	35 (mother,female) clear	57 (father,male) clear
+     76111	no mother as expected.	no father as expected.
+     76112	no mother as expected.	no father as expected.
+     76121	no mother as expected.	no father as expected.
+     2021	76112 (mother,female) clear	76111 (father,male) clear
+     2022	76112 (mother,female) clear	76111 (father,male) clear
+     2020	2021 (mother,female) clear	76121 (father,male) clear
+     76123	no mother as expected.	no father as expected.
+     2023	2021 (mother,female) clear	76123 (father,male) clear
+     76211	no mother as expected.	no father as expected.
+     2037	no mother as expected.	no father as expected.
+     2033	2037 (mother,female) clear	76211 (father,male) clear
+     76222	no mother as expected.	no father as expected.
+     2036	76222 (mother,female) clear	2033 (father,male) clear
+     2035	76222 (mother,female) clear	2033 (father,male) clear
+     2034	2037 (mother,female) clear	76211 (father,male) clear
+     2032	2037 (mother,female) clear	76211 (father,male) clear
+     76213	no mother as expected.	no father as expected.
+     2026	2032 (mother,female) clear	76213 (father,male) clear
+     2030	2037 (mother,female) clear	76211 (father,male) clear
+     76215	no mother as expected.	no father as expected.
+     2028	2030 (mother,female) clear	76215 (father,male) clear
+     2027	2030 (mother,female) clear	76215 (father,male) clear
+     2029	no mother as expected.	no father as expected.
+     2031	2037 (mother,female) clear	76211 (father,male) clear
+     2024	2031 (mother,female) clear	2029 (father,male) clear
+     2025	2031 (mother,female) clear	2029 (father,male) clear
+     #+end_example
+
+     Pass check
 
 
-   (Let's also strip the 'X's from the headers)
+*** Fixing the Genotypes
 
-   #+begin_src bash
-     sed -i.bak '1 s|X||g' ~/work/linkage/preprocessed/genotypes.new
-     head -1 ~/work/linkage/preprocessed/genotypes.new
-   #+end_src
+    Here we will remove =2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 2018 2019 2038 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2049 2050 2051 2052 2053 2054 2055 2056 2057 2058 2059 2060 21=
 
-   #+RESULTS:
-   | Name | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 2038 | 2039 | 2040 | 2041 | 2042 | 2043 | 2044 | 2045 | 2046 | 2047 | 2048 | 2049 | 2050 | 2051 | 2052 | 2053 | 2054 | 2055 | 2056 | 2057 | 2058 | 2059 | 2060 | 21 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
-
-   We want to skip columns =1-19=, =38-60=, =61= (+1 to all numbers to the left)
-
-   #+begin_src bash
-     cut --complement -f 2-20,39-61,62 ~/work/linkage/preprocessed/genotypes.new > ~/work/linkage/second/genotypes.new
-     head -2 ~/work/linkage/second/genotypes.new
-   #+end_src
-
-   #+RESULTS:
-   | Name      | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
-   | rs1000002 |   BB |   AB |   AA |   BB |   AB |   BB |   AB |   AA |   AB |   BB |   AB |   AB |   AB |   AB |   AB |   AB |   BB |   BB | AB | AB | AB | AB | BB | AB | BB | BB |
-
-
-** Generating New Map file   
-
-   (copied over files in =second= dir to work machine =02_second= folder)
-
-
-   Map and maf file as before.
-
-
-   #+begin_src sh :session linkage :dir /ssh:tetris@132.230.153.85:/home/tetris/work/ :results verbatim
-     cd /home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second
-     snpbutcher2.py map.all.txt maf.txt genotypes -z -nh > map.txt
-   #+end_src
-
-   #+RESULTS:
-   : 
-   : $ [ARGS] Zero maf markers too, NOT using hapmap 
-   : 
-   : [INFO] reading 'genotypes'...
-   : [INFO] found 15607/214093 SNPs uninformative
-   : [INFO] reading 'map.all.txt' and printing new map...
-   : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X 
-   : [INFO] new map contains 37968 SNPs
-
-   37,968 markers, which is less than the 38,570 we had before. Again, this is expected since the markers now have a higher change of being NC across all samples if the number of samples is reduced.
-
-   
-* Run 2
-
-  =bitscore.py= computed that the largest family (1183) has 18 bits. I ran out of storage on my work machine so I moved to an external hd.
-
-  Memory peaked on c01 for allegro at 10GB
-
-  It threw an inconsistent genotypes error at rs211641 for family 1181.
-
-  #+NAME: britpedigree
-  | 1181 | 7623 |    0 |    0 | 1 | 1 |
-  | 1181 |   32 | 7623 | 7624 | 2 | 1 |
-  | 1181 |   22 | 7623 | 7624 | 2 | 1 |
-  | 1181 | 7620 |    0 |    0 | 1 | 1 |
-  | 1181 |   44 |    0 |    0 | 1 | 1 |
-  | 1181 |   79 | 7620 |   32 | 1 | 2 |
-  | 1181 |   61 | 7620 |   32 | 1 | 2 |
-  | 1181 |   35 |   44 |   22 | 2 | 1 |
-  | 1181 |   57 |    0 |    0 | 1 | 1 |
-  | 1181 |   97 |   57 |   35 | 1 | 2 |
-  #+end_src
-
-  Let us extract the genotypes for that marker
-
-  #+begin_src bash
-  head -1 /mnt/robert/118_canspanbrit/02_second/genotypes
-  #+end_src
-
-  #+RESULTS:
-  | Name | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
-  
-  + 32 - col: 22
-  + 22 - col: 20
-  + 44 - col: 21
-  + 79 - col: 24
-  + 61 - col: 23
-  + 35 - col: 26
-  + 57 - col: 25
-  + 97 - col: 27
+    Let us perform a quick check on the headers
 
     #+begin_src bash
-    cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | head -1
-    cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | grep rs211641
+      head -1 ~/work/linkage/preprocessed/genotypes.new
     #+end_src
 
     #+RESULTS:
-    | Name     | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
-    | rs211641 | AB | AA | AB | BB | AA | BB | AA | AA |
+    | Name | X2001 | X2002 | X2003 | X2004 | X2005 | X2006 | X2007 | X2008 | X2009 | X2010 | X2011 | X2012 | X2013 | X2014 | X2015 | X2016 | X2017 | X2018 | X2019 | X2020 | X2021 | X2022 | X2023 | X2024 | X2025 | X2026 | X2027 | X2028 | X2029 | X2030 | X2031 | X2032 | X2033 | X2034 | X2035 | X2036 | X2037 | X2038 | X2039 | X2040 | X2041 | X2042 | X2043 | X2044 | X2045 | X2046 | X2047 | X2048 | X2049 | X2050 | X2051 | X2052 | X2053 | X2054 | X2055 | X2056 | X2057 | X2058 | X2059 | X2060 | X21 | X22 | X44 | X32 | X61 | X79 | X57 | X35 | X97 |
 
-  #+begin_src artist
-               7623[XY] --- 7624[XX]
-                         |
-                _________|_________
-               |                   |
-  7620[XY] --- 32[XX]      44[XY] --- 22[XX]
-            |                      |
-        ____|___                   |
-       |        |      57[XY] --- 35[XX]      
-   *79[XY    *61[XY]           |
-                             *97[XY]  
-  #+end_src
 
-  Here I have made a small drawing of the pedigree for family 1181, with males given as XY and females as XX, with affected individuals given a *.
+    (Let's also strip the 'X's from the headers)
 
-  Let's fill in the XY/XX with the genotypes
+    #+begin_src bash
+      sed -i.bak '1 s|X||g' ~/work/linkage/preprocessed/genotypes.new
+      head -1 ~/work/linkage/preprocessed/genotypes.new
+    #+end_src
 
-  #+begin_src artist
-               7623[XY] --- 7624[XX]
-                         |
-                _________|_________
-               |                   |
-  7620[XY] --- 32[AB]      44[AA] --- 22[AB]
-            |                      |
-        ____|___                   |
-       |        |      57[BB] --- 35[AA]      
-   *79[AA]    *61[BB]           |
-                             *97[AA]  
-  #+end_src
+    #+RESULTS:
+    | Name | 2001 | 2002 | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 2038 | 2039 | 2040 | 2041 | 2042 | 2043 | 2044 | 2045 | 2046 | 2047 | 2048 | 2049 | 2050 | 2051 | 2052 | 2053 | 2054 | 2055 | 2056 | 2057 | 2058 | 2059 | 2060 | 21 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
 
-  So given that the =Y= chromosome can only come from the father, and one of the =X='s from the mother, let us look for any inconsistencies.
+    We want to skip columns =1-19=, =38-60=, =61= (+1 to all numbers to the left)
 
-  We can actually see two:
-  + 7620 → 79 and 61 :: These are all males, so the offspring should share at least 1 allele, but the GT calls for the offspring are =AA= and =BB= which means they cannot share the same father.
-  + 57 → 97 :: Again, both males and yet not a single allele appears to be shared between them
+    #+begin_src bash
+      cut --complement -f 2-20,39-61,62 ~/work/linkage/preprocessed/genotypes.new > ~/work/linkage/second/genotypes.new
+      head -2 ~/work/linkage/second/genotypes.new
+    #+end_src
 
-    
-  From this we can conclude that allegro is correct in saying that this marker is inconsistent. What we can do next is remove this marker and then rerun the entire analysis (~ 2hrs), but there will likely be other markers which are inconsistent and this will be very slow to debug.
+    #+RESULTS:
+    | Name      | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+    | rs1000002 |   BB |   AB |   AA |   BB |   AB |   BB |   AB |   AA |   AB |   BB |   AB |   AB |   AB |   AB |   AB |   AB |   BB |   BB | AB | AB | AB | AB | BB | AB | BB | BB |
 
-  While I rerun this again (without rs211641) I will try to write my own parser to validate these kinds of genotypes
 
-** Rerun without rs211641
+*** Generating New Map file
 
-   Remove this marker from current map, maf, and genotypes. Currently we have:
+    (copied over files in =second= dir to work machine =02_second= folder)
 
-   #+begin_src bash 
-   wc -l /mnt/robert/118_canspanbrit/02_second/{genotypes,maf.txt,map.txt}
+
+    Map and maf file as before.
+
+
+    #+begin_src sh :session linkage :dir /ssh:tetris@132.230.153.85:/home/tetris/work/ :results verbatim
+      cd /home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second
+      snpbutcher2.py map.all.txt maf.txt genotypes -z -nh > map.txt
+    #+end_src
+
+    #+RESULTS:
+    :
+    : $ [ARGS] Zero maf markers too, NOT using hapmap
+    :
+    : [INFO] reading 'genotypes'...
+    : [INFO] found 15607/214093 SNPs uninformative
+    : [INFO] reading 'map.all.txt' and printing new map...
+    : [INFO] chromosome 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 X
+    : [INFO] new map contains 37968 SNPs
+
+    37,968 markers, which is less than the 38,570 we had before. Again, this is expected since the markers now have a higher change of being NC across all samples if the number of samples is reduced.
+
+
+** Run 2
+
+   =bitscore.py= computed that the largest family (1183) has 18 bits.
+
+   + Small notes:
+     - I ran out of storage on my work machine so I moved to an external hd.
+     - Memory peaked on c01 for allegro at 10GB
+
+*** rs211641 Error on chrX
+
+   It threw an inconsistent genotypes error at =rs211641= for family 1181:
+
+   #+NAME: britpedigree
+   | 1181 | 7623 |    0 |    0 | 1 | 1 |
+   | 1181 |   32 | 7623 | 7624 | 2 | 1 |
+   | 1181 |   22 | 7623 | 7624 | 2 | 1 |
+   | 1181 | 7620 |    0 |    0 | 1 | 1 |
+   | 1181 |   44 |    0 |    0 | 1 | 1 |
+   | 1181 |   79 | 7620 |   32 | 1 | 2 |
+   | 1181 |   61 | 7620 |   32 | 1 | 2 |
+   | 1181 |   35 |   44 |   22 | 2 | 1 |
+   | 1181 |   57 |    0 |    0 | 1 | 1 |
+   | 1181 |   97 |   57 |   35 | 1 | 2 |
    #+end_src
 
-   #+RESULTS:
-   | 214093 | /mnt/robert/118_canspanbrit/02_second/genotypes |
-   | 214093 | /mnt/robert/118_canspanbrit/02_second/maf.txt   |
-   |  37969 | /mnt/robert/118_canspanbrit/02_second/map.txt   |
-
-   and now if we remove one marker, we have:
+   Let us extract the genotypes for that marker
 
    #+begin_src bash
-   newdir=/mnt/robert/118_canspanbrit/03_nors211641
-   mkdir -p $newdir 
-   cp /mnt/robert/118_canspanbrit/02_second/pedfile.pro $newdir/pedfile.pro
-   cat /mnt/robert/118_canspanbrit/02_second/genotypes | grep -v rs211641 > $newdir/genotypes
-   cat /mnt/robert/118_canspanbrit/02_second/map.txt | grep -v rs211641 > $newdir/map.txt
-   cat /mnt/robert/118_canspanbrit/02_second/maf.txt | grep -v rs211641 > $newdir/maf.txt
-   wc -l $newdir/{genotypes,maf.txt,map.txt}
+   head -1 /mnt/robert/118_canspanbrit/02_second/genotypes
    #+end_src
 
    #+RESULTS:
-   | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/genotypes |
-   | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/maf.txt   |
-   |  37968 | /mnt/robert/118_canspanbrit/03_nors211641/map.txt   |
+   | Name | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 | 2037 | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
 
-   1 line less, good. 
+   + 32 - col: 22
+   + 22 - col: 20
+   + 44 - col: 21
+   + 79 - col: 24
+   + 61 - col: 23
+   + 35 - col: 26
+   + 57 - col: 25
+   + 97 - col: 27
 
-   Okay now we can rerun the whole pipeline again. There is a small issue that wine cannot see a mounted volume so let's link it to a directory in home and run it from there
+     #+begin_src bash
+     cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | head -1
+     cut -f 1,20-27 /mnt/robert/118_canspanbrit/02_second/genotypes | grep rs211641
+     #+end_src
 
-   #+begin_src bash
-   ln -s /mnt/robert/118_canspanbrit/03_nors211641 /home/tetris/work/jobs_for_people/robert/118_canspanbrit/03_nors211641
+     #+RESULTS:
+     | Name     | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+     | rs211641 | AB | AA | AB | BB | AA | BB | AA | AA |
+
+
+**** rs211641 in the pedigree 1181
+
+     Okay now let's see how these genotypes look on the pedigree (I will just draw it in ascii below)
+
+
+   #+begin_src artist
+                7623[XY] --- 7624[XX]
+                          |
+                 _________|_____________
+                |                       |
+   7620[XY] --- 32[XX]      44[XY] --- 22[XX]
+             |                      |
+         ____|___                   |
+        |        |      57[XY] --- 35[XX]
+    *79[XY    *61[XY]           |
+                              *97[XY]
    #+end_src
 
-   #+RESULTS:
+   Here I have made a small drawing of the pedigree for family 1181, with males given as =XY= and females as =XX=, with affected individuals given a *.
 
-*** GRR notes
+   Let's fill in the XY/XX with the genotypes from the above table.
 
-    Some things to note, in family 1183 - individual 2030 and 2034 are labelled as sister-brother, but the IBS relationship diagram seems to suggest that they might actually be mother-son! 
+   #+begin_src artist
+                7623[XY] --- 7624[XX]
+                          |
+                 _________|_____________
+                |                       |
+   7620[XY] --- 32[AB]      44[AA] --- 22[AB]
+             |                      |
+         ____|___                   |
+        |        |      57[BB] --- 35[AA]
+    *79[AA]    *61[BB]           |
+                              *97[AA]
+   #+end_src
 
-    Similarly, in family 1181 -- individual 57 and 97 are said to be father-son, but the IBS relationship diagram seems to suggest they might actually be brother-brother. This is a strange observation, since 57 comes from outside of the family, and yet there is a stronger familial tie between father-son than the mother-son. 
+   So given that the =Y= chromosome can only come from the father, and one of the =X='s from the mother, let us look for any inconsistencies.
 
-    Possible explanations are that 35 is not actually the mother, in which 97's mutation comes from outside of the family. 
-
-
-
-
+   We can actually see two:
+   + 7620 → 79 and 61 :: These are all males, so the offspring should share at least 1 allele, but the GT calls for the offspring are =AA= and =BB= which means they cannot share the same father.
+   + 57 → 97 :: Again, both males and yet not a single allele appears to be shared between them
 
 
+   From this we can conclude that allegro is correct in saying that this marker is inconsistent. What we can do next is remove this marker and then rerun the entire analysis (~ 2hrs), but there will likely be other markers which are inconsistent and this will be very slow to debug.
+
+   While I rerun this again (without rs211641) I will try to write my own parser to validate these kinds of genotypes
+
+*** Rerun without rs211641
+
+    Remove this marker from current map, maf, and genotypes. Currently we have:
+
+    #+begin_src bash
+    wc -l /mnt/robert/118_canspanbrit/02_second/{genotypes,maf.txt,map.txt}
+    #+end_src
+
+    #+RESULTS:
+    | 214093 | /mnt/robert/118_canspanbrit/02_second/genotypes |
+    | 214093 | /mnt/robert/118_canspanbrit/02_second/maf.txt   |
+    |  37969 | /mnt/robert/118_canspanbrit/02_second/map.txt   |
+
+    and now if we remove one marker, we have:
+
+    #+begin_src bash
+    newdir=/mnt/robert/118_canspanbrit/03_nors211641
+    mkdir -p $newdir
+    cp /mnt/robert/118_canspanbrit/02_second/pedfile.pro $newdir/pedfile.pro
+    cat /mnt/robert/118_canspanbrit/02_second/genotypes | grep -v rs211641 > $newdir/genotypes
+    cat /mnt/robert/118_canspanbrit/02_second/map.txt | grep -v rs211641 > $newdir/map.txt
+    cat /mnt/robert/118_canspanbrit/02_second/maf.txt | grep -v rs211641 > $newdir/maf.txt
+    wc -l $newdir/{genotypes,maf.txt,map.txt}
+    #+end_src
+
+    #+RESULTS:
+    | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/genotypes |
+    | 214092 | /mnt/robert/118_canspanbrit/03_nors211641/maf.txt   |
+    |  37968 | /mnt/robert/118_canspanbrit/03_nors211641/map.txt   |
+
+    1 line less, good.
+
+    Okay now we can rerun the whole pipeline again. There is a small issue that wine cannot see a mounted volume so let's link it to a directory in home and run it from there
+
+    #+begin_src bash
+    ln -s /mnt/robert/118_canspanbrit/03_nors211641 /home/tetris/work/jobs_for_people/robert/118_canspanbrit/03_nors211641
+    #+end_src
+
+    #+RESULTS:
+
+** Run 3 (without rs211641)
+
+**** GRR notes
+
+     I thought I saw some weird things in GRR. Not overly weird, but perhaps potential clues to the inconsistent markers.
+     Edit: Nope, it just appears that the Y chromosome clusters separately from the X, which is expected.
+
+***** Family 1183 (Canadian)
+
+     #+CAPTION: Family 1183
+     #+NAME: fig:1183
+     [[./grr_screenshot_03_nors211641-family-1183.png]]
+
+
+     Ideally, all the different kinds of relationships (Siblings, Half-siblings, Parent-Child, Unrelated, and Other) should all cluster separately from one another without any mixing. From image [@fig:1181] we can see that there this one yellow (Parent-offspring) neighbouring the Sib-pairs, hinting that this particular relationship has been mislabelled.
+
+     For reference, a parent-offspring relationship expects roughly 50% of the genotypes to be shared from one individual to another, whereas siblings would expect to share a much higher proportion.
+
+     So here in this red cluster we have 3 yellow dots which reference the relationship between the following individuals:
+
+     | Person1 | Person2 | Relationship |
+     |---------+---------+--------------|
+     |    2029 |    2025 | father-son   |
+     |    2033 |    2036 | father-son   |
+     |    2033 |    2035 | father-son   |
+
+     And if we look at the other yellow dot cluster underneath this, this is made up of the following relationships:
+
+       #+begin_src bash
+       cat /mnt/robert/118_canspanbrit/03_nors211641/test.txt | sed  's|1183->||g' | awk '{print $1"\t"$2"\t"$NF}'
+       #+end_src
+
+       #+RESULTS:
+       | Person1 | Person2 | Relationship    |
+       |---------+---------+-----------------|
+       |    2031 |    2037 | daughter-mother |
+       |    2024 |    2031 | daughter-mother |
+       |    2033 |    2037 | son-mother      |
+       |    2034 |    2037 | son-mother      |
+       |    2032 |    2037 | daughter-mother |
+       |    2030 |    2037 | daughter-mother |
+       |    2028 |    2030 | daughter-mother |
+       |    2026 |    2032 | son-mother      |
+       |    2024 |    2029 | daughter-father |
+       |    2025 |    2031 | son-mother      |
+       |    2027 |    2030 | son-mother      |
+
+
+       Okay so from this we can conclude two things:
+
+       1. That father-son relationships cluster separately from mother-son/mother-daughter/father-daughter relationships.
+       2. That father-son relationships softly cluster with the sib-pair relationships
+
+
+       Why might this be? Well, recombination in the Y-chromosome is not expected, so it actually kind of makes sense that father's and son's would share more than 50% of their genotypes if the Y allele is unbroken. 
+
+
+***** Family 1181 (British)
+      
+      In this family we again see a yellow dot softly clustering within the reds:
+
+      #+CAPTION: Family 1181
+      #+NAME: fig:1181
+         [[./grr_screenshot_03_nors211641-family-1181.png]]
+
+      If we take a closer look:
+
+       | Person1 | Person2 | Relationship |
+       |---------+---------+--------------|
+       |      57 |    97   | father-son   |
+
+       
+       And the yellow dots that cluster separately below it:
+
+
+       #+begin_src bash
+       cat /mnt/robert/118_canspanbrit/03_nors211641/test2.txt | sed  's|1181->||g' | awk '{print $1"\t"$2"\t"$NF}'
+       #+end_src
+
+       #+RESULTS:
+       | Person1 | Person2 | Relationship    |
+       |---------+---------+-----------------|
+       |      35 |      97 | mother-son      |
+       |      32 |      79 | mother-son      |
+       |      32 |      61 | mother-son      |
+       |      22 |      35 | mother-daughter |
+       |      35 |      44 | mother-son      |
+
+       So again, we see Y-chromosome cluster's separately from the X.
+
+
+**** rs5983047 Error on chrX
+
+     This time the inconsistent marker appeared at position =rs5983047= for family 1181. Let us again look at the genotypes of this marker in scope of the pedigree.
+
+     #+begin_src bash
+     cut -f 1,20-27 /mnt/robert/118_canspanbrit/03_nors211641/genotypes | head -1
+     cut -f 1,20-27 /mnt/robert/118_canspanbrit/03_nors211641/genotypes | grep rs5983047
+     #+end_src
+
+     #+RESULTS:
+     | Name      | 22 | 44 | 32 | 61 | 79 | 57 | 35 | 97 |
+     | rs5983047 | AB | BB | BB | BB | BB | AA | BB | BB |
+
+     (ordering: Males on the left, and Females on the right)
+
+     #+begin_src artist
+                    7623[XY] --- 7624[XX]
+                              |
+                     _________|_____________
+                    |                       |
+       7620[XY] --- 32[BB]      44[BB] --- 22[AB]
+                 |                      |
+             ____|___                   |
+            |        |      57[AA] --- 35[BB]
+        *79[BB]    *61[BB]          |
+                                  *97[BB]
+     #+end_src
+
+     I only see one violation which is the =57= to =97= (father-son) where the Y chromosome should be inherited (at least one =A=) but we see =BB= instead, so this is definitely a violation.
+
+     Sure I could repeat the analysis without rs5983047, but I really should parse all father-son relationships and see which markers are inconsistent.
