@@ -1771,8 +1771,8 @@
    So from this pedigree we will need to look for:
    1. A trio of mother-father-child who are all genotyped (and then check the child against each parent)
    2. Two males in a family (if they don't share an alelle, we flag them)
- 
-      
+
+
    To find these, we need to do a second pass where we identify siblings. These will be useful in comparing the compatibility of genotypes across males sharing the same father.
 
 
@@ -1813,7 +1813,7 @@
 
   The pedigree is populated, but we need to iterate through the genotypes. Due to how large the file is, we can't load the entire file to memory, but luckily we don't have to since we only need to check that genotypes are consistent across a single marker. So we will simply read through this file line-by-line.
 
-  As mentioned previously, we will use the genotypes from =02_second/= where we have not kicked out any inconsistent markers (=rs211641= and =rs5983047=) as a validation for our method. 
+  As mentioned previously, we will use the genotypes from =02_second/= where we have not kicked out any inconsistent markers (=rs211641= and =rs5983047=) as a validation for our method.
 
 **** Method
 
@@ -1996,7 +1996,7 @@
      #+RESULTS:
      [[file:~/work/linkage/second/inconsistent.txt]]
 
-     #+begin_src bash 
+     #+begin_src bash
        head -10 ~/work/linkage/second/inconsistent.txt
        wc -l ~/work/linkage/second/inconsistent.txt
      #+end_src
@@ -2014,7 +2014,7 @@
      | rs10023523	((:relation (brother-brother 2034 2033) :alleles (BB AA)))                                                    |
      | 8151 /home/tetris/work/linkage/second/inconsistent.txt                                                                      |
 
-     8000 inconsistent markers...! 
+     8000 inconsistent markers...!
 
 ***** Summarize inconsistent markers
 
@@ -2054,7 +2054,7 @@
 
       We only wish to have the chromosome X markers, so let's build a quick map. We will use the complete map from =02_second/map.all.txt=.
 
-      #+begin_src elisp 
+      #+begin_src elisp
         (setq chromX (make-hash-table :size 1000 :test #'equal))
         (with-current-buffer (find-file-noselect "/ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second/map.all.txt")
           (goto-char (point-min))
@@ -2077,13 +2077,13 @@
 
 **** Test on Entire Genotypes (again, but this time on ChrX)
 
-     
+
      #+CALL: inconsistentXmarkers(filename="/ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second/genotypes") :results value file :file ~/work/linkage/second/inconsistent.X.txt
 
      #+RESULTS:
      [[file:~/work/linkage/second/inconsistent.X.txt]]
 
-     #+begin_src bash 
+     #+begin_src bash
        head -10 ~/work/linkage/second/inconsistent.X.txt
        wc -l ~/work/linkage/second/inconsistent.X.txt
      #+end_src
@@ -2117,14 +2117,32 @@
 
       It appears that brothers 79 and 61 still appear to have more inconsistencies than others, but 2034 and 2033 are now on the lower end of the list. Also, there are no inconsistencies in female relationships, so I feel I can trust this result.
 
+      Just a quick look at the alleles too for these relationships
+
+      #+begin_src bash
+        grep -oP ":relation \([^)]+\) :alleles \([^)]+\)" "/home/tetris/work/linkage/second/inconsistent.X.txt"\
+            | sed -r 's/(:relation|:alleles)//g'\
+            | sed -r 's/[\(\)]//g'\
+            | sort | uniq -c
+      #+end_src
+
+      #+RESULTS:
+      | Occur | Relationship    |  ID1 |  ID2 | A1 | A2 |
+      |-------+-----------------+------+------+----+----|
+      |   100 | brother-brother | 2034 | 2033 | AA | BB |
+      |    84 | brother-brother | 2034 | 2033 | BB | AA |
+      |   251 | brother-brother |   79 |   61 | AA | BB |
+      |   257 | brother-brother |   79 |   61 | BB | AA |
+      |   145 | father-son      | 2029 | 2025 | AA | BB |
+      |   150 | father-son      | 2029 | 2025 | BB | AA |
+      |   145 | father-son      | 2033 | 2035 | AA | BB |
+      |   144 | father-son      | 2033 | 2035 | BB | AA |
+      |   145 | father-son      | 2033 | 2036 | AA | BB |
+      |   150 | father-son      | 2033 | 2036 | BB | AA |
+      |   140 | father-son      |   57 |   97 | AA | BB |
+      |   125 | father-son      |   57 |   97 | BB | AA |
+
+      Yep, not a common Y allele from father to son, and brother to brother.
+
 
 ** Remove inconsistent X-linked Markers from genotypes
-
-      
-
-      
-
-
-
-     
-      
