@@ -1843,13 +1843,15 @@
         (goto-char (point-min))
         (let ((headers (-map #'string-to-number (cdr (readtokens))))
               (error-markers nil))
-          (while (not (eobp))
+          ;;(while (not (eobp))
+          (while (<= (length error-markers) 10)
             (let* ((linedata (readtokens))
                    (marker (car linedata))
                    ;; convert genotypes from strings to symbols ("AB" to (A . B))
-                   (genotypes (--map (list (intern (car it))
-                                           (intern (cadr it)))
-                                     (--map (split-string it "" t) (cdr linedata))))
+                   (genotypes (--map (if it (list (intern (car it)) (intern (cadr it))))
+                                     (--map (if (string= "NC" it) nil
+                                              (split-string it "" t))
+                                            (cdr linedata))))
                    ;; Each line will be bound to the header (e.g. 2020 . AA, 2022 . BB)
                    (genobind (--zip-with (cons it other) headers genotypes)))
               ;; Now we iterate through the individuals
@@ -1864,38 +1866,69 @@
                        (sisters (plist-get indiv-info :sisters))
                        (brothers (plist-get indiv-info :brothers)))
                   ;;
-                  (cond ((eq gender 'male)
-                         ;; If male, check brothers and fathers
-                         (if (and father (alist-get father genobind))
-                             ;; At this point we could check all brothers against their father's types
-                             ;; too, but note that we will effectively do this in later iterations
-                             ;; when the individual becomes one of the brothers.
-                             (atleastone? alleles father "father-son")
-                           ;;
-                           ;; If no father, check against brothers
-                           (dolist (bro brothers)
-                             (atleastone? alleles bro "brother-brother"))))
-                        ;;
-                        ((eq gender 'female)
-                         ;; If female, sisters don't matter.
-                         ;; Just check at least 1 allele from mother and father (if present)
-                         (if (and father (alist-get father genobind))
-                             (atleastone? alleles father "father-daughter"))
-                         (if (and mother (alist-get mother genobind))
-                             (atleastone? alleles mother "mother-daughter")))
-                        ;;
-                        (t (user-error "Unknown gender for %d" id)))))))
-          error-markers)))
+                  (if alleles  ;; NC we ignore
+                      (cond ((eq gender 'male)
+                             ;; If male, check brothers and fathers
+                             (if (and father (alist-get father genobind))
+                                 ;; At this point we could check all brothers against their father's types
+                                 ;; too, but note that we will effectively do this in later iterations
+                                 ;; when the individual becomes one of the brothers.
+                                 (atleastone? alleles father "father-son")
+                               ;;
+                               ;; If no father, check against brothers
+                               (dolist (bro brothers)
+                                 (if (alist-get bro genobind)  ;; NC we ignore
+                                     (atleastone? alleles bro "brother-brother")))))
+                            ;;
+                            ((eq gender 'female)
+                             ;; If female, sisters don't matter.
+                             ;; Just check at least 1 allele from mother and father (if present)
+                             (if (and father (alist-get father genobind))
+                                 (atleastone? alleles father "father-daughter"))
+                             (if (and mother (alist-get mother genobind))
+                                 (atleastone? alleles mother "mother-daughter")))
+                            ;;
+                            (t (user-error "Unknown gender for %d" id))))))))
+          ;;
+          ;; Remove duplicates (e.g. two brothers referencing each other
+          (setq errmark error-markers))))
+      
+          ;;error-markers)))
   #+end_src
+
+  #+begin_src elisp
+    (cl-labels ((getrelationship (it)
+                                 (car (plist-get it :relation)))
+                (getids (it)
+                        (sort (cdr (plist-get it :relation)) #'<))
+                (elems-equal-p (first second)
+                               (and (string= (getrelationship first)
+                                             (getrelationship second))
+                                    (equal (getids first)
+                                           (getids second)))))
+      (dolist (marker-err errmark)
+        (let* ((marker (car marker-err))
+               (data (cdr marker-err))
+               (res nil))
+          (dolist (relate-allele data)
+            (if (>= (--count (elems-equal-p relate-allele it) data) 1)
+                ;; If the element exists twice, nullify it
+                (setf relate-allele nil))))))
+  #+end_src
+
+
+
 
 **** Test Genotypes
 
-     Below is a small subset of the genotypes file containing two markers we know are inconsistent, which we will test on.
+     Below is a small subset of the genotypes file containing two markers we know are inconsistent, as well as two with =NC='s which we will test on.
 
      #+begin_src text :tangle test.genos
        Name	2020	2021	2022	2023	2024	2025	2026	2027	2028	2029	2030	2031	2032	2033	2034	2035	2036	2037	22	44	32	61	79	57	35	97
        rs5983047	BB	AB	BB	AA	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	AB	BB	BB	BB	BB	AA	BB	BB
        rs211641	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	AA	BB	BB	AB	AA	AB	BB	AA	BB	AA	AA
+       rs1000373	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	NC	AB	AB	AB	AB	AB	AA	BB	AB
+       rs10001894	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	AA	NC	AA	AA	NC	AA	AA	AA
      #+end_src
 
 
@@ -1905,10 +1938,36 @@
      | rs211641  | (:relation (father-son 2033 2035) :alleles (BB AA)) | (:relation (brother-brother 79 61) :alleles (AA BB)) | (:relation (brother-brother 61 79) :alleles (BB AA)) | (:relation (father-son 57 97) :alleles (BB AA)) |
      | rs5983047 | (:relation (father-son 57 97) :alleles (AA BB))     |                                                      |                                                      |                                                 |
 
-     Good, it found both markers and with valid reasons
+     Good, it found both markers and with valid reasons, and the NC calls were ignored.
 
 **** Real Genotypes
 
      Now let's try this on all our markers 
 
      #+CALL: inconsistentXmarkers(filename="/ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second/genotypes")
+
+     #+RESULTS:
+     | rs10023523 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs1002182  | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs10020676 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs10019140 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs1001874  | (:relation (father-son 2029 2025) :alleles (BB AA))      |                                                          |                                                          |
+     | rs10006395 | (:relation (brother-brother 79 61) :alleles (BB AA))     | (:relation (brother-brother 61 79) :alleles (AA BB))     |                                                          |
+     | rs1000530  | (:relation (father-son 2029 2025) :alleles (AA BB))      | (:relation (brother-brother 2034 2033) :alleles (AA BB)) | (:relation (brother-brother 2033 2034) :alleles (BB AA)) |
+     | rs1000440  | (:relation (brother-brother 79 61) :alleles (BB AA))     | (:relation (brother-brother 61 79) :alleles (AA BB))     |                                                          |
+     | rs10002760 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs10000984 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs1000047  | (:relation (brother-brother 79 61) :alleles (AA BB))     | (:relation (brother-brother 61 79) :alleles (BB AA))     |                                                          |
+
+     #+NAME: OldResults
+     | rs1000530  | (:relation (father-son 2029 2025) :alleles (AA BB))      | (:relation (brother-brother 2034 2033) :alleles (AA BB)) | (:relation (brother-brother 2033 2034) :alleles (BB AA)) |
+     | rs1000440  | (:relation (brother-brother 79 61) :alleles (BB AA))     | (:relation (brother-brother 61 79) :alleles (AA BB))     |                                                          |
+     | rs10002760 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs10002437 | (:relation (brother-brother 79 61) :alleles (BB NC))     | (:relation (brother-brother 61 79) :alleles (NC BB))     |                                                          |
+     | rs10001894 | (:relation (brother-brother 79 61) :alleles (NC AA))     | (:relation (brother-brother 61 79) :alleles (AA NC))     | (:relation (father-daughter 44 35) :alleles (NC AA))     |
+     | rs1000141  | (:relation (mother-daughter 22 35) :alleles (NC AB))     |                                                          |                                                          |
+     | rs1000121  | (:relation (brother-brother 79 61) :alleles (AA NC))     | (:relation (brother-brother 61 79) :alleles (NC AA))     |                                                          |
+     | rs10000988 | (:relation (mother-daughter 2030 2028) :alleles (NC BB)) | (:relation (mother-daughter 2037 2030) :alleles (BB NC)) |                                                          |
+     | rs10000984 | (:relation (brother-brother 2034 2033) :alleles (BB AA)) | (:relation (brother-brother 2033 2034) :alleles (AA BB)) |                                                          |
+     | rs1000047  | (:relation (brother-brother 79 61) :alleles (AA BB))     | (:relation (brother-brother 61 79) :alleles (BB AA))     |                                                          |
+     | rs10000438 | (:relation (brother-brother 79 61) :alleles (NC AB))     | (:relation (brother-brother 61 79) :alleles (AB NC))     |                                                          |
