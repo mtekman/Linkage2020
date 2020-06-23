@@ -2018,11 +2018,14 @@
 
 ***** Summarize inconsistent markers
 
-      #+begin_src bash
-        grep -oP ":relation \([^)]+\)"  ~/work/linkage/second/inconsistent.txt\
+      #+NAME: relationships
+      #+begin_src bash :var filename=""
+        grep -oP ":relation \([^)]+\)"  $filename\
             | sed 's|:relation (||g'\
             | sort | uniq -c | sort -rnk 1
       #+end_src
+
+      #+CALL: relationships(filename=(expand-file-name "~/work/linkage/second/inconsistent.txt"))
 
       #+RESULTS:
       | Occur | Relationship    |  ID1 |  ID2 |
@@ -2100,11 +2103,7 @@
 
      Now it's only 671 inconsistent markers. That's a lot less than 8000, but still higher than I would have guessed.
 
-      #+begin_src bash
-        grep -oP ":relation \([^)]+\)"  ~/work/linkage/second/inconsistent.X.txt\
-            | sed 's|:relation (||g'\
-            | sort | uniq -c | sort -rnk 1
-      #+end_src
+      #+CALL: relationships(filename=(expand-file-name "~/work/linkage/second/inconsistent.X.txt"))
 
       #+RESULTS:
       | Occur | Relationship    |  ID1 |  ID2 |
