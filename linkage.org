@@ -422,70 +422,70 @@
 
 ** Consistency check
 
-   Let's export the three tables into the same file and see if there any repeat individuals, and that the parents match. Lisp is good for this.
+   Let's export the three tables into the same file and see if there any repeat individuals, and that the <<parents match>>. Lisp is good for this.
 
    #+NAME: pedfileCheck
    #+begin_src elisp :results value
-          (let ((mapped-file nil))
-            (with-current-buffer "pedfile.pro"
-              (goto-char (point-min))
-              ;; Parse file
-              (while (not (eobp))
-                (let* ((lvals (--map (string-to-number it)
-                                     (split-string
-                                      (buffer-substring-no-properties
-                                       (point)
-                                       (progn (forward-line 1) (point)))
-                                      "[	 ]" nil "[ \n]")))
-                       (entry (list (cadr lvals) ;; id -- alist
-                                    :family (car lvals)
-                                    :father (nth 2 lvals) :mother (nth 3 lvals)
-                                    :gender (cond ((eq (nth 4 lvals) 0) 'unknown)
-                                                  ((eq (nth 4 lvals) 1) 'male)
-                                                  ((eq (nth 4 lvals) 2) 'female)
-                                                  (t (user-error "Gender error")))
-                                    :affect (cond ((eq (nth 5 lvals) 0) 'unknown)
-                                                  ((eq (nth 5 lvals) 1) 'yes)
-                                                  ((eq (nth 5 lvals) 2) 'no)
-                                                  (t (user-error "affected error"))))))
-                  (push entry mapped-file))))
-            ;; check duplicate ids
-            (let* ((ids (mapcar 'identity mapped-file))
-                   (lenids (length ids))
-                   (uniqids (-uniq ids))
-                   (lenuniq (length uniqids)))
-              (unless (eq lenids lenuniq)
-                (user-error "Id's in pedfile are not unique: %s"
-                            (-difference ids uniqids))))
-            ;; Check gender and parentage
-            (cl-labels ((checkparent (idp relation)
-                                     (let* ((id-data (alist-get idp mapped-file))
-                                            (gender (plist-get id-data :gender)))
-                                       (if (eq 0 idp)
-                                           (format "no %s as expected." relation)
-                                         (unless id-data
-                                           (user-error "%id: %d (%s) does not exist "
-                                                       id idp relation))
-                                         (cond ((and (eq relation 'mother)
-                                                     (not (eq gender 'female)))
-                                                (user-error "%d: %d (%s) is not female, but %s"
-                                                            id idp relation gender))
-                                               ((and (eq relation 'father)
-                                                     (not (eq gender 'male)))
-                                                (user-error "%d: %d (%s) is not male, but %s"
-                                                            id idp relation gender))
-                                               (t (format "%d (%s,%s) clear"
-                                                          idp relation gender)))))))
-              ;; recursion would be expensive, simple loop would suffice
-              (let ((res nil))
-                (dolist (entry mapped-file (message (mapconcat 'identity res "\n")))
-                  (let ((id (car entry))
-                         (mother (plist-get (cdr entry) :mother))
-                         (father (plist-get (cdr entry) :father)))
-                    (push (format "%d\t%s\t%s" id
-                                  (checkparent mother 'mother)
-                                  (checkparent father 'father))
-                          res))))))
+     (let ((mapped-file nil))
+       (with-current-buffer "pedfile.pro"
+         (goto-char (point-min))
+         ;; Parse file
+         (while (not (eobp))
+           (let* ((lvals (--map (string-to-number it)
+                                (split-string
+                                 (buffer-substring-no-properties
+                                  (point)
+                                  (progn (forward-line 1) (point)))
+                                 "[	 ]" nil "[ \n]")))
+                  (entry (list (cadr lvals) ;; id -- alist
+                               :family (car lvals)
+                               :father (nth 2 lvals) :mother (nth 3 lvals)
+                               :gender (cond ((eq (nth 4 lvals) 0) 'unknown)
+                                             ((eq (nth 4 lvals) 1) 'male)
+                                             ((eq (nth 4 lvals) 2) 'female)
+                                             (t (user-error "Gender error")))
+                               :affect (cond ((eq (nth 5 lvals) 0) 'unknown)
+                                             ((eq (nth 5 lvals) 1) 'yes)
+                                             ((eq (nth 5 lvals) 2) 'no)
+                                             (t (user-error "affected error"))))))
+             (push entry mapped-file))))
+       ;; check duplicate ids
+       (let* ((ids (mapcar 'identity mapped-file))
+              (lenids (length ids))
+              (uniqids (-uniq ids))
+              (lenuniq (length uniqids)))
+         (unless (eq lenids lenuniq)
+           (user-error "Id's in pedfile are not unique: %s"
+                       (-difference ids uniqids))))
+       ;; Check gender and parentage
+       (cl-labels ((checkparent (idp relation)
+                                (let* ((id-data (alist-get idp mapped-file))
+                                       (gender (plist-get id-data :gender)))
+                                  (if (eq 0 idp)
+                                      (format "no %s as expected." relation)
+                                    (unless id-data
+                                      (user-error "%id: %d (%s) does not exist "
+                                                  id idp relation))
+                                    (cond ((and (eq relation 'mother)
+                                                (not (eq gender 'female)))
+                                           (user-error "%d: %d (%s) is not female, but %s"
+                                                       id idp relation gender))
+                                          ((and (eq relation 'father)
+                                                (not (eq gender 'male)))
+                                           (user-error "%d: %d (%s) is not male, but %s"
+                                                       id idp relation gender))
+                                          (t (format "%d (%s,%s) clear"
+                                                     idp relation gender)))))))
+         ;; recursion would be expensive, simple loop would suffice
+         (let ((res nil))
+           (dolist (entry mapped-file (message (mapconcat 'identity res "\n")))
+             (let ((id (car entry))
+                    (mother (plist-get (cdr entry) :mother))
+                    (father (plist-get (cdr entry) :father)))
+               (push (format "%d\t%s\t%s" id
+                             (checkparent mother 'mother)
+                             (checkparent father 'father))
+                     res))))))
    #+end_src
 
    #+RESULTS:
@@ -1194,7 +1194,7 @@
 
 
 
-* Linkage Analysis
+* Linkage Analysis (Attempt 1)
 
 ** Snpbutcher
 
@@ -1220,7 +1220,7 @@
    We have 38,570 SNPs selected at a cM distance of 0.05.  The =-z= flag is used to essentially skip the maf file, and the =-nh= is used to not check against HapMap.
 
 
-** Initial Linkage Run
+** Run1
 
    #+begin_src sh :session linkage
    linkage_pipeline.sh
@@ -1633,11 +1633,11 @@
        2. That father-son relationships softly cluster with the sib-pair relationships
 
 
-       Why might this be? Well, recombination in the Y-chromosome is not expected, so it actually kind of makes sense that father's and son's would share more than 50% of their genotypes if the Y allele is unbroken. 
+       Why might this be? Well, recombination in the Y-chromosome is not expected, so it actually kind of makes sense that father's and son's would share more than 50% of their genotypes if the Y allele is unbroken.
 
 
 ***** Family 1181 (British)
-      
+
       In this family we again see a yellow dot softly clustering within the reds:
 
       #+CAPTION: Family 1181
@@ -1650,7 +1650,7 @@
        |---------+---------+--------------|
        |      57 |    97   | father-son   |
 
-       
+
        And the yellow dots that cluster separately below it:
 
 
@@ -1701,3 +1701,214 @@
      I only see one violation which is the =57= to =97= (father-son) where the Y chromosome should be inherited (at least one =A=) but we see =BB= instead, so this is definitely a violation.
 
      Sure I could repeat the analysis without rs5983047, but I really should parse all father-son relationships and see which markers are inconsistent.
+
+
+* Remove inconsistent X-linked Markers
+
+  We could just limit ourselves to examining father-son relationships, but it would likely be more useful to look for /any/ marker inconsistency between parents and siblings. This actually is something that Merlin should do already, but it's likely that it fails to do this for the X chromosome. Again, we could just limit ourselves to father-son relationships on the just the X-chromosome, but we want to be thorough.
+
+  The genotypes file we will use will be the original one, so that we can check that =rs211641= and =rs5983047= are detected by my parser.
+
+** Parse the Pedigree
+
+   Here we will reuse some code from the [[@:parents match]] section above, and use the latest pedigree from /03_nors211641/.
+
+   #+begin_src elisp
+     (setq pedigree nil)
+     (with-current-buffer (find-file-noselect "/ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/03_nors211641/pedfile.pro")
+       (goto-char (point-min))
+       (while (not (eobp))
+         (let* ((nilornot (lambda (x) (unless (eq x 0) x)))
+                (lvals (--map (string-to-number it)
+                              (split-string
+                               (buffer-substring-no-properties
+                                (point)
+                                (progn (forward-line 1) (point)))
+                               "[	 ]" nil "[ \n]")))
+                (entry (list (cadr lvals) ;; id -- alist
+                             :family (car lvals)
+                             :father (funcall nilornot (nth 2 lvals))
+                             :mother (funcall nilornot (nth 3 lvals))
+                             :gender (cond ((eq (nth 4 lvals) 0) 'unknown)
+                                           ((eq (nth 4 lvals) 1) 'male)
+                                           ((eq (nth 4 lvals) 2) 'female)
+                                           (t (user-error "Gender error")))
+                             :affect (cond ((eq (nth 5 lvals) 0) 'unknown)
+                                           ((eq (nth 5 lvals) 1) 'yes)
+                                           ((eq (nth 5 lvals) 2) 'no)
+                                           (t (user-error "affected error"))))))
+           (push entry pedigree))))
+     ;; check duplicate ids
+     (let* ((ids (mapcar 'identity pedigree))
+            (lenids (length ids))
+            (uniqids (-uniq ids))
+            (lenuniq (length uniqids)))
+       (unless (eq lenids lenuniq)
+         (user-error "Id's in pedfile are not unique: %s" (-difference ids uniqids))))
+     ;; Check gender and parentage
+     (cl-labels ((checkparent (idp relation)
+                              (let* ((id-data (alist-get idp pedigree))
+                                     (gender (plist-get id-data :gender)))
+                                (if (not idp) (format "no %s as expected." relation)
+                                  (unless id-data (user-error "%id: %d (%s) does not exist " id idp relation))
+                                  (cond ((and (eq relation 'mother) (not (eq gender 'female)))
+                                         (user-error "%d: %d (%s) is not female, but %s" id idp relation gender))
+                                        ((and (eq relation 'father) (not (eq gender 'male)))
+                                         (user-error "%d: %d (%s) is not male, but %s" id idp relation gender))
+                                        (t (format "%d (%s,%s) clear" idp relation gender)))))))
+       ;; recursion would be expensive, simple loop would suffice
+       (let ((res nil))
+         (dolist (entry pedigree)
+           (let ((id (car entry))
+                 (mother (plist-get (cdr entry) :mother))
+                 (father (plist-get (cdr entry) :father)))
+             (checkparent mother 'mother)
+             (checkparent father 'father)))))
+   #+end_src
+
+   #+RESULTS:
+
+   So from this pedigree we will need to look for:
+   1. A trio of mother-father-child who are all genotyped (and then check the child against each parent)
+   2. Two males in a family (if they don't share an alelle, we flag them)
+ 
+      
+   To find these, we need to do a second pass where we identify siblings. These will be useful in comparing the compatibility of genotypes across males sharing the same father.
+
+
+   #+begin_src elisp :results verbatim
+     (dolist (indata pedigree)
+       (let* ((indiv (car indata))
+              (restd (cdr indata))
+              (gender (plist-get restd :gender))
+              (father (plist-get restd :father))
+              (mother (plist-get restd :mother))
+              ;; Find siblings
+              (siblings (--map (cons (car it) (plist-get (cdr it) :gender))
+                               (--filter (and (not (eq (car it) indiv)) ;; not the same indiv
+                                              (eq (plist-get (cdr it) :father) father)
+                                              (eq (plist-get (cdr it) :mother) mother))
+                                         pedigree)))
+              (brothers (-map #'car (--filter (eq 'male (cdr it)) siblings)))
+              (sisters (-map #'car (--filter (eq 'female (cdr it)) siblings))))
+         ;;
+         (if (and mother father)  ;; not a founder
+             (setf indata (list indiv (plist-put
+                                       (plist-put restd :sisters sisters)
+                                       :brothers brothers))))))
+     ;; Quick check on two random individual
+     (concat
+      (format "%s" (nth 2 pedigree)) "\n"
+      (format "%s" (nth 3 pedigree)))
+   #+end_src
+
+   #+RESULTS:
+   : "(2031 :family 1183 :father 76211 :mother 2037 :gender female :affect yes :sisters (2030 2032) :brothers (2034 2033))
+   : (2029 :family 1183 :father nil :mother nil :gender male :affect yes)"
+
+
+   Okay, so a founder individual =2029= has no siblings, and individual =2031= has 2 sisters and 2 brothers. Right, so it works.
+
+   Now let's parse genotypes
+
+** Parse the Genotypes
+
+  The pedigree is populated, but we need to iterate through the genotypes. Due to how large the file is, we can't load the entire file to memory, but luckily we don't have to since we only need to check that genotypes are consistent across a single marker. So we will simply read through this file line-by-line.
+
+  As mentioned previously, we will use the genotypes from =02_second/= where we have not kicked out any inconsistent markers (=rs211641= and =rs5983047=) as a validation for our method. 
+
+**** Method
+
+  #+NAME: inconsistentXmarkers
+  #+begin_src elisp :var filename=""
+    (cl-labels ((readtokens () (split-string (buffer-substring-no-properties
+                                              (point)
+                                              (progn (forward-line 1) (point)))
+                                             "[	 ]" nil "[ \n]"))
+                (unitealleles (allpairs) (format "%s%s" (car allpairs) (cadr allpairs)))
+                (atleastone? (alleles parentid relationship)
+                             (--> (alist-get parentid genobind)
+                                  (unless (or (member (car alleles) it)
+                                              (member (cadr alleles) it))
+                                    ;; 1 allele not inherited
+                                    (let ((newinf (list :relation (list relationship parentid id)
+                                                        :alleles (list (unitealleles it) (unitealleles alleles))))
+                                          (existing (alist-get marker error-markers)))
+                                      (if existing
+                                          (setf (alist-get marker error-markers)
+                                                (append existing (list newinf)))
+                                        ;; Otherwise push new
+                                        (push (list marker newinf) error-markers)))))))
+      (with-current-buffer (find-file-noselect filename)
+        (goto-char (point-min))
+        (let ((headers (-map #'string-to-number (cdr (readtokens))))
+              (error-markers nil))
+          (while (not (eobp))
+            (let* ((linedata (readtokens))
+                   (marker (car linedata))
+                   ;; convert genotypes from strings to symbols ("AB" to (A . B))
+                   (genotypes (--map (list (intern (car it))
+                                           (intern (cadr it)))
+                                     (--map (split-string it "" t) (cdr linedata))))
+                   ;; Each line will be bound to the header (e.g. 2020 . AA, 2022 . BB)
+                   (genobind (--zip-with (cons it other) headers genotypes)))
+              ;; Now we iterate through the individuals
+              (dolist (indiv genobind)
+                (let* ((id (car indiv))
+                       (alleles (cdr indiv))
+                       ;; pedigree info
+                       (indiv-info (alist-get id pedigree))
+                       (gender (plist-get indiv-info :gender))
+                       (mother (plist-get indiv-info :mother))
+                       (father (plist-get indiv-info :father))
+                       (sisters (plist-get indiv-info :sisters))
+                       (brothers (plist-get indiv-info :brothers)))
+                  ;;
+                  (cond ((eq gender 'male)
+                         ;; If male, check brothers and fathers
+                         (if (and father (alist-get father genobind))
+                             ;; At this point we could check all brothers against their father's types
+                             ;; too, but note that we will effectively do this in later iterations
+                             ;; when the individual becomes one of the brothers.
+                             (atleastone? alleles father "father-son")
+                           ;;
+                           ;; If no father, check against brothers
+                           (dolist (bro brothers)
+                             (atleastone? alleles bro "brother-brother"))))
+                        ;;
+                        ((eq gender 'female)
+                         ;; If female, sisters don't matter.
+                         ;; Just check at least 1 allele from mother and father (if present)
+                         (if (and father (alist-get father genobind))
+                             (atleastone? alleles father "father-daughter"))
+                         (if (and mother (alist-get mother genobind))
+                             (atleastone? alleles mother "mother-daughter")))
+                        ;;
+                        (t (user-error "Unknown gender for %d" id)))))))
+          error-markers)))
+  #+end_src
+
+**** Test Genotypes
+
+     Below is a small subset of the genotypes file containing two markers we know are inconsistent, which we will test on.
+
+     #+begin_src text :tangle test.genos
+       Name	2020	2021	2022	2023	2024	2025	2026	2027	2028	2029	2030	2031	2032	2033	2034	2035	2036	2037	22	44	32	61	79	57	35	97
+       rs5983047	BB	AB	BB	AA	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	AB	BB	BB	BB	BB	AA	BB	BB
+       rs211641	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	BB	AA	BB	BB	AB	AA	AB	BB	AA	BB	AA	AA
+     #+end_src
+
+
+     #+CALL: inconsistentXmarkers(filename="test.genos")
+
+     #+RESULTS:
+     | rs211641  | (:relation (father-son 2033 2035) :alleles (BB AA)) | (:relation (brother-brother 79 61) :alleles (AA BB)) | (:relation (brother-brother 61 79) :alleles (BB AA)) | (:relation (father-son 57 97) :alleles (BB AA)) |
+     | rs5983047 | (:relation (father-son 57 97) :alleles (AA BB))     |                                                      |                                                      |                                                 |
+
+     Good, it found both markers and with valid reasons
+
+**** Real Genotypes
+
+     Now let's try this on all our markers 
+
+     #+CALL: inconsistentXmarkers(filename="/ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/02_second/genotypes")
