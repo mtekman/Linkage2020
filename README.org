@@ -2857,7 +2857,7 @@ folder and the =map.all.txt= file from the =02_analysis= folder.
      We lost most of our genotypes from SNPbutcher. What if we modify it so that instead of kicking out markers with any NC calls, it only kicks out the markers with only a few calls of NC. *Edit:* No, the way informative markers are decided is *NOT* by the number of NC calls, but actually whether or not all genotypes have the same call across all individuals.
 
 * Linkage Analysis (Attempt 6)
-
+  
   Let's use all the X markers we can, informative or not. We will use the same genotypes file from the last run which has the inconsistent markers removed. 
 
   In this run for chromosome X we will have : consistent X markers + uninformative X markers
@@ -2989,7 +2989,9 @@ folder and the =map.all.txt= file from the =02_analysis= folder.
 
 ** Mystery of Inconsistent Markers
 
-  But then the mystery of why allegro throws an inconsistent marker error for the alleles I examined still remains. I now believe it is likely to do with how allegro is configured, since it is trying to interpret the X genotypes as autosomal (where you would indeed expect 1 allele to come from the father).
+  But then the mystery of why allegro throws an inconsistent marker error for the alleles I examined still remains. If I look at those [[rs211641 in the pedigree 1181][same]] two [[rs5983047 Error on chrX][markers]] I analysed they are actually consistent with the mothers alleles, so I am at a loss to what is going on.
+
+  I now believe it is likely to do with how allegro is configured, since it is trying to interpret the X genotypes as autosomal (where you would indeed expect 1 allele to come from the father). I need to look into the (hard to find) manual.
 
 ** HaploForge Legitimacy
 
@@ -3029,4 +3031,135 @@ Not for export, we redefine the html image function to embed all images in-house
 
   If it's X-recessive, mother's should not show the phenotype but son's always will, so it actually made no sense from the beginning that =2033= was unaffected. (Perhaps false parentage?)
 
+  Let's copy some files over from run 5 (without the uninformative so we don't get that weird peak)
+
+  #+begin_src sh :dir /ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/
+   mkdir -p 07_affected2033
+   cp 05_noinconsistentX2/{map.txt,maf.txt,genotypes,pedfile.pro} 07_affected2033/
+  #+end_src
+
+  #+RESULTS:
+
+  Let's modify the pedfile to make 2033 affected
+
+  #+begin_src text :tangle /ssh:tetris@132.230.153.85:/home/tetris/work/jobs_for_people/robert/118_canspanbrit/07_affected2033/pedfile.pro
+    1181	7623	0	0	1	1
+    1181	7624	0	0	2	1
+    1181	32	7623	7624	2	1
+    1181	22	7623	7624	2	1
+    1181	7620	0	0	1	1
+    1181	44	0	0	1	1
+    1181	79	7620	32	1	2
+    1181	61	7620	32	1	2
+    1181	35	44	22	2	1
+    1181	57	0	0	1	1
+    1181	97	57	35	1	2
+    1182	76111	0	0	1	1
+    1182	76112	0	0	2	1
+    1182	76121	0	0	1	1
+    1182	2021	76111	76112	2	1
+    1182	2022	76111	76112	1	2
+    1182	2020	76121	2021	1	2
+    1182	76123	0	0	1	1
+    1182	2023	76123	2021	1	2
+    1183	76211	0	0	1	1
+    1183	2037	0	0	2	1
+    1183	2033	76211	2037	1	2
+    1183	76222	0	0	2	1
+    1183	2036	2033	76222	1	1
+    1183	2035	2033	76222	1	1
+    1183	2034	76211	2037	1	2
+    1183	2032	76211	2037	2	1
+    1183	76213	0	0	1	1
+    1183	2026	76213	2032	1	1
+    1183	2030	76211	2037	2	1
+    1183	76215	0	0	1	1
+    1183	2028	76215	2030	2	1
+    1183	2027	76215	2030	1	1
+    1183	2029	0	0	1	1
+    1183	2031	76211	2037	2	1
+    1183	2024	2029	2031	2	1
+    1183	2025	2029	2031	1	2
+  #+end_src
+
+  and re-run.
+
+** Result
+
+   Wow. The LOD score jumped from 1.43 to 3.76  and the peak flattened (albeit still being quite wide).
+
+   #+CAPTION: (Top) Allegro and (Bottom) GeneHunter for (Left) entire genome and (Right) only chromosome X.
+   #+NAME: LinkageResults3
+   [[./imgs/summary3.png]]
+    
+
+   #+CAPTION: Messner Output
+   | Program    | Chrom | Position            | Markers               |  LOD |
+   |------------+-------+---------------------+-----------------------+------|
+   | Allegro    | chrX  | 41235894 - 82959062 | rs787088 - rs7060133  | 3.76 |
+   | Genehunter | chrX  | 35031054 - 67707597 | rs3124850 - rs5919577 | 3.69 |
+
+   Included in the =07_affected2033= folder are the combined and individual linkage plots for this run (2033 is affected), and within the =05_noinconsistentX2= folder are the combined and individual linkage plots for the run with the same inputs as this one with the default pedigree (2033 is unaffected).
+
+** Collect :noexport:
+
+   #+begin_src sh :dir /ssh:tetris@132.230.153.85:/mnt/robert/118_canspanbrit/07_affected2033
+     newdir=$(pwd)_collect
+     mkdir -p $newdir
+     cp README.txt $newdir/
+     #
+     # -- convert all ps files --
+     postfiles=$(find ./ -type f -name "*.ps")
+     for file in $postfiles; do
+         newname=$(dirname "$file")/$(basename "$file" ".ps").pdf
+         ! [ -e $newname ] && ps2pdf $file $newname
+     done
+     #
+     function cp_pdf {
+         from=$1
+         to=$2
+         mkdir -p $to
+         cp -v $from/*.pdf $to/
+     }
+
+     # -- Allegro --
+     # haplotypes + messner
+     cp_pdf allegro $newdir/allegro/haplotypes
+     cp allegro/messner_allegro_lod*.txt $newdir/allegro/
+     # linkage plots
+     cp_pdf allegro/plot_alohomora/ $newdir/allegro/plot_alohomora/
+     cp_pdf allegro/plot_physical_adjusted/ $newdir/allegro/plot_physical_adjusted/
+     families=$(echo allegro-*)
+     for fold in $families; do
+         cp_pdf $fold/plot_alohomora/ $newdir/allegro/$fold/plot_alohomora/
+         cp_pdf $fold/plot_physical_adjusted/ $newdir/allegro/$fold/plot_physical_adjusted/
+     done
+
+     # -- Genehunter --
+     # linkage plots + messner
+     cp_pdf gh_200 $newdir/genehunter
+     cp gh_200/messner_genehunter_lod*.txt $newdir/genehunter/
+     familiesg=$(echo genehunter-family*)
+     for fold in $familiesg; do
+         cp_pdf $fold $newdir/genehunter/$fold/
+     done
+
+     # -- preprocessing --
+     mkdir -p $newdir/preprocessing
+     cp {gendercheck.txt,genotypes_Fam_*.pdf,merlin_lod.pdf,unlikely_genotypes.txt} $newdir/preprocessing
+
+     # -- inputfiles --
+     mkdir -p $newdir/inputfiles
+     cp {genotypes,maf.txt,map.txt,pedfile.pro} $newdir/inputfiles
+
+     # -- pedigrees --
+     mkdir -p $newdir/pedigrees
+     cp family_*.pdf $newdir/pedigrees
+
+     # -- grr --
+     mkdir -p $newdir/grr
+     cp grr_* $newdir/grr
+
+     zip -r $newdir.zip $newdir
+   #+end_src
   
